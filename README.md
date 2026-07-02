@@ -1,11 +1,10 @@
 # Perfect Girl ♥
 
-A very serious yes/no compatibility test. Would you still say yes?
+A yes/no compatibility test. Would you still say yes?
 
-Each prospect starts with **"Perfect girl, but…"** followed by one small
-(usually roach-related) dealbreaker, shown over a photo. Say **Yes** or **No** —
-tap the buttons, swipe the card, or use the arrow keys. At the end you get your
-official **roach tolerance** verdict.
+Each prospect starts with **"Perfect girl, but…"** followed by one dealbreaker,
+shown over a photo. Say **Yes** or **No** — tap the buttons, swipe the card, or
+use the arrow keys. At the end you get a compatibility result.
 
 ## Run it
 

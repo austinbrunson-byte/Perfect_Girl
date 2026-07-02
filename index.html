@@ -125,14 +125,14 @@
       <!-- results -->
       <div class="results" id="results">
         <div class="big" id="roachPct">0%</div>
-        <div class="biglabel">roach tolerance</div>
+        <div class="biglabel">compatibility</div>
         <div class="verdict" id="verdict"></div>
         <div class="rblurb" id="rblurb"></div>
         <div class="rrow">
           <div class="stat"><b id="sYes">0</b><span>said yes</span></div>
           <div class="stat"><b id="sNo">0</b><span>said no</span></div>
         </div>
-        <button class="again" id="again">Find her again ♥</button>
+        <button class="again" id="again">Start over</button>
       </div>
     </div>
 
@@ -141,7 +141,7 @@
       <button class="btn yes" id="btnYes"><span class="ico">♥</span> Yes</button>
     </div>
     <div class="hint" id="hint">Tap Yes or No · or swipe the card</div>
-    <footer>Photos via Unsplash · A very serious compatibility test</footer>
+    <footer>Photos via Unsplash</footer>
   </div>
 
 <script>
@@ -171,11 +171,11 @@ function fallbackFor(i){
   );
 }
 
-/* The prompts. One register only: deadpan. Flat, clinical, specific.
-   Mostly roach body-horror stated as fact; a few non-roach anomalies.
-   No winks, no punchlines, no pop-culture references. */
+/* The prompts. One register only: deadpan — flat, specific, stated as fact.
+   Roughly 70% involve roaches; the rest are ordinary dealbreakers and a few
+   other anomalies. No punchlines, no winks, nothing that announces itself. */
 const ISSUES = [
-  /* ---------- roaches ---------- */
+  /* ---------- roaches (~70%) ---------- */
   "every time she flushes the toilet, a roach spawns somewhere in the house.",
   "for one minute every month she turns into a roach. At random.",
   "she can telepathically command every roach within a five-mile radius.",
@@ -244,7 +244,37 @@ const ISSUES = [
   "kissing her neck carries a 4% chance of coinciding with a crossing beneath her collar.",
   "the guest slippers at her apartment have a 10% occupancy rate. Discovery is toe-first.",
 
-  /* ---------- non-roach anomalies ---------- */
+  /* ---------- Shaq ---------- */
+  "for eleven seconds each morning she is Shaquille O'Neal — height, reach, and voice included. Then it passes.",
+  "she is 7 feet 1 inch tall. The day you met her she was not.",
+  "she has attempted four thousand free throws in her life and made none of them.",
+  "her shoe size is 22. The shoes are always precisely where you step in the dark.",
+  "she can hold your entire head in one hand. She does this while you are talking.",
+  "she breaks one backboard a year. She does not play basketball.",
+
+  /* ---------- insurance ---------- */
+  "she knows your auto policy number. You have never told anyone your auto policy number.",
+  "she can save you 15% on car insurance. You do not own a car.",
+  "at 6:14 each morning she states a monthly premium aloud, then goes back to sleep.",
+  "she quotes you a rate for a vehicle you have not purchased yet. The rate is correct.",
+  "her voicemail greeting is a coverage quote. It updates with the market.",
+
+  /* ---------- ordinary dealbreakers ---------- */
+  "she leaves wet towels on the bed. Every morning. You have discussed it.",
+  "she has never once been on time.",
+  "she still texts her ex. Only on his birthday, but every birthday.",
+  "she keeps the apartment at 61 degrees year-round and will not negotiate.",
+  "she chews with her mouth open and cannot hear it.",
+  "she has forty thousand dollars of debt she has not mentioned.",
+  "she does not want children. You have not told her that you do.",
+  "she narrates every movie you watch together, start to finish.",
+  "she is close with her mother. They speak nine times a day.",
+  "she saves nothing. Every dollar arrives and leaves the same afternoon.",
+  "she corrects your grammar in front of other people.",
+  "she has three cats and is getting a fourth. You are allergic.",
+  "she takes phone calls on speaker in public, always.",
+
+  /* ---------- other anomalies ---------- */
   "2% of her freckles are load-bearing.",
   "her left ear runs 3 milliseconds behind her right.",
   "she pays $4.99 per month for a service that has never been identified.",
@@ -320,20 +350,20 @@ function finish(){
 
   let verdict, blurb;
   if(pct === 100){
-    verdict = "Unconditional love. Get her a ring (and an EpiPen).";
-    blurb = "You said yes to every single flaw. The roaches have accepted you as one of their own. Congratulations, you monster in love.";
+    verdict = "Total compatibility.";
+    blurb = "You said yes to every item. No objection was recorded.";
   } else if(pct >= 75){
-    verdict = "You'd move in. You'd caulk the baseboards, but you'd move in.";
-    blurb = "Deeply in love and only slightly itchy. You see past the antennae to the woman underneath. Mostly woman.";
+    verdict = "Strongly compatible.";
+    blurb = "You accepted almost all of her. The exceptions were few and specific.";
   } else if(pct >= 50){
-    verdict = "It's complicated. Beautiful, but crunchy.";
-    blurb = "You're on the fence, and the fence has roaches on it. Half of you is smitten, half of you keeps a shoe by the bed.";
+    verdict = "Compatible.";
+    blurb = "You said yes more often than no. On balance, it holds.";
   } else if(pct >= 25){
-    verdict = "You've got standards. Cruel, cruel standards.";
-    blurb = "A few deal-breakers turned into most deal-breakers. Perfect girl deserves someone who doesn't scream. Keep looking.";
+    verdict = "Marginal.";
+    blurb = "You said no to most of it. Whether the rest is enough is not something the test can answer.";
   } else {
-    verdict = "Single by choice. The choice being 'not a roach.'";
-    blurb = "You rejected nearly everything. Perfect girl was right there and you brought a can of Raid to the first date. Alone, but pest-free.";
+    verdict = "Incompatible.";
+    blurb = "You rejected nearly all of it. The result is not ambiguous.";
   }
   els.verdict.textContent = verdict;
   els.rblurb.textContent = blurb;
