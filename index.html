@@ -161,10 +161,15 @@ const PHOTOS = [
   "https://images.unsplash.com/photo-1534528741775-53994a69daeb"
 ];
 const IMG_Q = "?auto=format&fit=crop&w=640&h=800&q=80";
-// tiny inline fallback if a photo fails to load
-const FALLBACK = "data:image/svg+xml;utf8," + encodeURIComponent(
-  '<svg xmlns="http://www.w3.org/2000/svg" width="640" height="800"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff86bd"/><stop offset="1" stop-color="#3a0f26"/></linearGradient></defs><rect width="640" height="800" fill="url(#g)"/><text x="320" y="420" font-size="120" text-anchor="middle" fill="#fff4f8">♥</text></svg>'
-);
+// inline fallback if a photo fails to load — varied per card so a deck of
+// placeholders (e.g. offline) still looks intentional rather than broken.
+const FB_TOPS = ["#ff86bd","#ffd23f","#8f6bff","#4fd1c5","#ff9e6b","#6bb8ff","#ff6b9d","#7ee081"];
+function fallbackFor(i){
+  const top = FB_TOPS[i % FB_TOPS.length];
+  return "data:image/svg+xml;utf8," + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="640" height="800"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+top+'"/><stop offset="1" stop-color="#3a0f26"/></linearGradient></defs><rect width="640" height="800" fill="url(#g)"/><text x="320" y="440" font-size="150" text-anchor="middle" fill="#fff4f8">♥</text></svg>'
+  );
+}
 
 /* The prompts. Major themes, as nature intended: roaches, Shaq, The General
    (insurance), and the occasional Wilford Brimley. ~80%+ involve a roach or Shaq. */
@@ -284,7 +289,7 @@ function render(){
   els.count.textContent = 'Prospect ' + (idx+1) + ' of ' + total;
   els.issue.textContent = deck[idx];
   const src = photoDeck[idx % photoDeck.length] + IMG_Q;
-  els.photo.onerror = () => { els.photo.onerror = null; els.photo.src = FALLBACK; };
+  els.photo.onerror = () => { els.photo.onerror = null; els.photo.src = fallbackFor(idx); };
   els.photo.src = src;
   els.card.classList.remove('out-yes','out-no','in');
   void els.card.offsetWidth;      // reflow to restart animation
