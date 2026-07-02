@@ -122,6 +122,22 @@
   .tlist-h{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--pink2);margin-bottom:4px;
     position:sticky;top:0;background:var(--bg2);padding:4px 0}
   .tlist-i{font-size:13px;line-height:1.4;color:var(--ink);padding:5px 2px;border-bottom:1px solid rgba(255,255,255,.05)}
+  .tlist-note{color:var(--dim);font-size:12px;font-style:italic;margin-top:3px;line-height:1.35}
+  #trainView .rrow{flex-wrap:wrap}
+
+  /* ---- maybe (swipe up + note) ---- */
+  .card.text-only{touch-action:none}
+  .card.out-up{transform:translateY(-120%) rotate(-6deg);opacity:0}
+  .stamp.maybe{left:50%;top:14px;transform:translateX(-50%) rotate(-8deg) scale(1.2);
+    color:var(--gold);border-color:var(--gold);text-shadow:0 2px 10px rgba(255,210,63,.4)}
+  .btn.maybe{background:linear-gradient(180deg,#ffdf6b,#f0b400);color:#2a1a00}
+  .note{display:none;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);
+    border-radius:18px;padding:14px;margin-top:14px;text-align:left;flex:0 0 auto}
+  .note-q{font-family:var(--disp);font-style:italic;color:var(--pink2);font-size:14px;line-height:1.35;margin-bottom:10px}
+  .note textarea{width:100%;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.14);border-radius:12px;
+    color:var(--ink);font:inherit;font-size:15px;padding:10px 12px;resize:vertical;min-height:92px}
+  .note textarea:focus{outline:2px solid var(--pink);outline-offset:1px}
+  .note-btns{display:flex;gap:10px;margin-top:10px}
 </style>
 </head>
 <body>
@@ -184,6 +200,7 @@
         <div class="card text-only in" id="tcard">
           <div class="stamp yes" id="tStampGood">Good</div>
           <div class="stamp no" id="tStampBad">Bad</div>
+          <div class="stamp maybe" id="tStampMaybe">Maybe</div>
           <div class="prompt">
             <div class="lead">Perfect girl, but…</div>
             <div class="issue" id="tissue"></div>
@@ -194,6 +211,7 @@
           <div class="verdict">Your ratings</div>
           <div class="rrow">
             <div class="stat"><b id="tGood">0</b><span>good</span></div>
+            <div class="stat"><b id="tMaybe">0</b><span>maybe</span></div>
             <div class="stat"><b id="tBad">0</b><span>bad</span></div>
             <div class="stat"><b id="tRest">0</b><span>unrated</span></div>
           </div>
@@ -207,11 +225,21 @@
         </div>
       </div>
 
+      <div class="note" id="tnote">
+        <div class="note-q" id="tnoteQ"></div>
+        <textarea id="tnoteText" placeholder="What works, what doesn't…"></textarea>
+        <div class="note-btns">
+          <button class="btn ghost" id="tnoteCancel">Cancel</button>
+          <button class="btn yes" id="tnoteSave">Save maybe</button>
+        </div>
+      </div>
+
       <div class="btns" id="tbtns">
         <button class="btn no" id="btnBad"><span class="ico">✕</span> Bad</button>
+        <button class="btn maybe" id="btnMaybe"><span class="ico">?</span> Maybe</button>
         <button class="btn yes" id="btnGood"><span class="ico">♥</span> Good</button>
       </div>
-      <div class="hint" id="thint">Swipe or tap · right = good, left = bad · <button class="linkbtn" id="tExport">see ratings ▸</button></div>
+      <div class="hint" id="thint">Swipe or tap · left bad · up maybe · right good · <button class="linkbtn" id="tExport">see ratings ▸</button></div>
     </section>
     <footer>Photos via Unsplash</footer>
   </div>
@@ -490,53 +518,96 @@ const t = {
   fill: document.getElementById('tfill'), count: document.getElementById('tcount'),
   results: document.getElementById('tresults'),
   stampGood: document.getElementById('tStampGood'), stampBad: document.getElementById('tStampBad'),
+  stampMaybe: document.getElementById('tStampMaybe'),
   btns: document.getElementById('tbtns'), hint: document.getElementById('thint'),
-  good: document.getElementById('tGood'), bad: document.getElementById('tBad'),
-  rest: document.getElementById('tRest'), lists: document.getElementById('tlists'),
+  note: document.getElementById('tnote'), noteQ: document.getElementById('tnoteQ'),
+  noteText: document.getElementById('tnoteText'), noteSave: document.getElementById('tnoteSave'),
+  noteCancel: document.getElementById('tnoteCancel'),
+  good: document.getElementById('tGood'), maybe: document.getElementById('tMaybe'),
+  bad: document.getElementById('tBad'), rest: document.getElementById('tRest'),
+  lists: document.getElementById('tlists'),
   copy: document.getElementById('tCopy'), download: document.getElementById('tDownload'),
   resume: document.getElementById('tResume'), reset: document.getElementById('tReset'),
   exportLink: document.getElementById('tExport')
 };
 
-const LS_KEY = 'pg_train_ratings_v1';
-function loadRatings(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)) || {}; } catch(e){ return {}; } }
+/* ratings shape: { [prompt]: { verdict:'good'|'bad'|'maybe', note:'' } } */
+const LS_KEY = 'pg_train_ratings_v2';
+function loadRatings(){
+  try{ const v2 = JSON.parse(localStorage.getItem(LS_KEY)); if(v2) return v2; }catch(e){}
+  try{  // migrate v1 (string verdicts, no notes)
+    const v1 = JSON.parse(localStorage.getItem('pg_train_ratings_v1'));
+    if(v1){ const out={}; for(const k in v1){ out[k]={verdict:v1[k], note:''}; } return out; }
+  }catch(e){}
+  return {};
+}
 function saveRatings(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(tRatings)); } catch(e){} }
+function tV(x){ const r = tRatings[x]; return r && r.verdict; }
+function tN(x){ const r = tRatings[x]; return (r && r.note) || ''; }
 
 let tRatings = loadRatings();
 let tDeck = ISSUES.slice();
-let tIdx = 0, tInited = false;
+let tIdx = 0, tInited = false, tNoteOpen = false;
 
-function tRatedCount(){ return tDeck.reduce((n,x)=> n + (tRatings[x] ? 1 : 0), 0); }
+function tRatedCount(){ return tDeck.reduce((n,x)=> n + (tV(x) ? 1 : 0), 0); }
 
 function tRender(){
   const total = tDeck.length, cur = tDeck[tIdx];
   t.fill.style.width = (tIdx/total*100) + '%';
   t.count.textContent = 'Question ' + (tIdx+1) + ' of ' + total + ' · ' + tRatedCount() + ' rated'
-    + (tRatings[cur] ? ' · currently ' + tRatings[cur] : '');
+    + (tV(cur) ? ' · currently ' + tV(cur) : '');
   t.issue.textContent = cur;
-  t.card.classList.remove('out-yes','out-no','in');
+  t.card.classList.remove('out-yes','out-no','out-up','in');
   void t.card.offsetWidth;
   t.card.classList.add('in');
   t.card.style.transform=''; t.card.style.opacity='';
-  t.stampGood.style.opacity=0; t.stampBad.style.opacity=0;
+  t.stampGood.style.opacity=0; t.stampBad.style.opacity=0; t.stampMaybe.style.opacity=0;
 }
 
-function tChoose(good){
-  const cur = tDeck[tIdx];
-  tRatings[cur] = good ? 'good' : 'bad';
-  saveRatings();
+function tSet(verdict, note){ tRatings[tDeck[tIdx]] = { verdict: verdict, note: note || '' }; saveRatings(); }
+
+function tAdvance(dir){   // 'yes' | 'no' | 'up'
   t.card.classList.remove('in');
-  t.card.classList.add(good ? 'out-yes' : 'out-no');
+  t.card.classList.add(dir==='no' ? 'out-no' : (dir==='up' ? 'out-up' : 'out-yes'));
   setTimeout(()=>{ tIdx++; if(tIdx >= tDeck.length) tFinish(); else tRender(); }, 300);
 }
 
+function tChoose(verdict){
+  if(verdict==='maybe'){ tOpenNote(); return; }
+  tSet(verdict);
+  tAdvance(verdict==='good' ? 'yes' : 'no');
+}
+
+function tOpenNote(){
+  tNoteOpen = true;
+  const cur = tDeck[tIdx];
+  t.noteQ.textContent = 'Perfect girl, but… ' + cur;
+  t.noteText.value = tV(cur)==='maybe' ? tN(cur) : '';
+  t.card.style.transition=''; t.card.style.transform='';   // snap card back into place
+  t.stampGood.style.opacity=0; t.stampBad.style.opacity=0; t.stampMaybe.style.opacity=0;
+  t.btns.style.display='none'; t.hint.style.display='none'; t.note.style.display='block';
+  t.noteText.focus();
+}
+function tCloseNote(){
+  tNoteOpen = false;
+  t.note.style.display='none'; t.btns.style.display=''; t.hint.style.display='';
+}
+t.noteSave.addEventListener('click', ()=>{ tSet('maybe', t.noteText.value.trim()); tCloseNote(); tAdvance('up'); });
+t.noteCancel.addEventListener('click', ()=>{ tCloseNote(); t.card.style.transform=''; });
+t.noteText.addEventListener('keydown', e=>{
+  if(e.key==='Escape'){ e.preventDefault(); t.noteCancel.click(); }
+  if(e.key==='Enter' && (e.metaKey||e.ctrlKey)){ e.preventDefault(); t.noteSave.click(); }
+});
+
 function tCards(){
+  tCloseNote();
   t.results.classList.remove('show');
   t.card.style.display=''; t.btns.style.display=''; t.hint.style.display='';
   tRender();
 }
 
 function tFinish(){
+  tCloseNote();
   t.card.style.display='none'; t.btns.style.display='none'; t.hint.style.display='none';
   t.fill.style.width='100%';
   t.count.textContent = 'Ratings so far';
@@ -547,37 +618,45 @@ function tFinish(){
 function tStart(){
   tRatings = loadRatings();
   tDeck = ISSUES.slice();
-  const i = tDeck.findIndex(x=>!tRatings[x]);
+  const i = tDeck.findIndex(x=>!tV(x));
   if(i < 0){ tIdx = tDeck.length; tFinish(); }   // everything already rated
   else { tIdx = i; tCards(); }                    // resume at first unrated
 }
 
-function tListEl(title, arr){
+function tListEl(title, arr, withNotes){
   const wrap = document.createElement('div'); wrap.className = 'tlist';
   const h = document.createElement('div'); h.className = 'tlist-h';
   h.textContent = title + ' (' + arr.length + ')'; wrap.appendChild(h);
-  arr.forEach(x=>{ const p = document.createElement('div'); p.className = 'tlist-i'; p.textContent = x; wrap.appendChild(p); });
+  arr.forEach(x=>{
+    const p = document.createElement('div'); p.className = 'tlist-i'; p.textContent = x; wrap.appendChild(p);
+    if(withNotes && tN(x)){ const n = document.createElement('div'); n.className='tlist-note'; n.textContent = '“' + tN(x) + '”'; wrap.appendChild(n); }
+  });
   return wrap;
 }
 
 function tUpdateResults(){
-  const good = tDeck.filter(x=>tRatings[x]==='good');
-  const bad  = tDeck.filter(x=>tRatings[x]==='bad');
+  const good  = tDeck.filter(x=>tV(x)==='good');
+  const maybe = tDeck.filter(x=>tV(x)==='maybe');
+  const bad   = tDeck.filter(x=>tV(x)==='bad');
   t.good.textContent = good.length;
+  t.maybe.textContent = maybe.length;
   t.bad.textContent = bad.length;
-  t.rest.textContent = tDeck.length - good.length - bad.length;
+  t.rest.textContent = tDeck.length - good.length - maybe.length - bad.length;
   t.lists.innerHTML = '';
-  t.lists.appendChild(tListEl('Good', good));
-  t.lists.appendChild(tListEl('Bad', bad));
+  t.lists.appendChild(tListEl('Good', good, false));
+  t.lists.appendChild(tListEl('Maybe', maybe, true));
+  t.lists.appendChild(tListEl('Bad', bad, false));
 }
 
 function tPayload(){
-  const good = tDeck.filter(x=>tRatings[x]==='good');
-  const bad  = tDeck.filter(x=>tRatings[x]==='bad');
+  const good  = tDeck.filter(x=>tV(x)==='good');
+  const bad   = tDeck.filter(x=>tV(x)==='bad');
+  const maybe = tDeck.filter(x=>tV(x)==='maybe').map(x=>({ text:x, note: tN(x) }));
   return {
     ratedAt: new Date().toISOString(),
-    counts: { good: good.length, bad: bad.length, unrated: tDeck.length-good.length-bad.length, total: tDeck.length },
-    good, bad, ratings: tRatings
+    counts: { good: good.length, maybe: maybe.length, bad: bad.length,
+              unrated: tDeck.length - good.length - maybe.length - bad.length, total: tDeck.length },
+    good, maybe, bad, ratings: tRatings
   };
 }
 
@@ -609,37 +688,47 @@ t.reset.addEventListener('click', ()=>{
 });
 t.exportLink.addEventListener('click', tFinish);
 
-document.getElementById('btnGood').addEventListener('click', ()=>tChoose(true));
-document.getElementById('btnBad').addEventListener('click', ()=>tChoose(false));
+document.getElementById('btnGood').addEventListener('click', ()=>tChoose('good'));
+document.getElementById('btnBad').addEventListener('click', ()=>tChoose('bad'));
+document.getElementById('btnMaybe').addEventListener('click', ()=>tChoose('maybe'));
 
-/* train swipe */
-let tDrag=false, tSX=0, tDX=0;
-function tDown(x){ tDrag=true; tSX=x; tDX=0; t.card.style.transition='none'; }
-function tMove(x){
+/* train swipe — left = bad, right = good, up = maybe */
+let tDrag=false, tSX=0, tSY=0, tDX=0, tDY=0;
+function tDown(x,y){ if(tNoteOpen) return; tDrag=true; tSX=x; tSY=y; tDX=0; tDY=0; t.card.style.transition='none'; }
+function tMove(x,y){
   if(!tDrag) return;
-  tDX = x - tSX;
-  t.card.style.transform = 'translateX('+tDX+'px) rotate('+(tDX*0.05)+'deg)';
-  t.stampGood.style.opacity = tDX > 0 ? Math.min(tDX/90,1) : 0;
-  t.stampBad.style.opacity  = tDX < 0 ? Math.min(-tDX/90,1) : 0;
+  tDX = x - tSX; tDY = y - tSY;
+  if(tDY < 0 && Math.abs(tDY) > Math.abs(tDX)){            // dragging up → maybe
+    t.card.style.transform = 'translateY('+tDY+'px) rotate('+(tDX*0.02)+'deg)';
+    t.stampMaybe.style.opacity = Math.min(-tDY/90, 1);
+    t.stampGood.style.opacity = 0; t.stampBad.style.opacity = 0;
+  } else {                                                  // horizontal → good/bad
+    t.card.style.transform = 'translateX('+tDX+'px) rotate('+(tDX*0.05)+'deg)';
+    t.stampGood.style.opacity = tDX > 0 ? Math.min(tDX/90,1) : 0;
+    t.stampBad.style.opacity  = tDX < 0 ? Math.min(-tDX/90,1) : 0;
+    t.stampMaybe.style.opacity = 0;
+  }
 }
 function tUp(){
   if(!tDrag) return;
   tDrag=false; t.card.style.transition='';
-  if(Math.abs(tDX) > 90){ tChoose(tDX > 0); }
-  else { t.card.style.transform=''; t.stampGood.style.opacity=0; t.stampBad.style.opacity=0; }
+  if(tDY < 0 && Math.abs(tDY) > Math.abs(tDX) && Math.abs(tDY) > 80){ tChoose('maybe'); }
+  else if(Math.abs(tDX) > 90){ tChoose(tDX > 0 ? 'good' : 'bad'); }
+  else { t.card.style.transform=''; t.stampGood.style.opacity=0; t.stampBad.style.opacity=0; t.stampMaybe.style.opacity=0; }
 }
-t.card.addEventListener('touchstart', e=>tDown(e.touches[0].clientX), {passive:true});
-t.card.addEventListener('touchmove',  e=>tMove(e.touches[0].clientX), {passive:true});
+t.card.addEventListener('touchstart', e=>tDown(e.touches[0].clientX, e.touches[0].clientY), {passive:true});
+t.card.addEventListener('touchmove',  e=>tMove(e.touches[0].clientX, e.touches[0].clientY), {passive:true});
 t.card.addEventListener('touchend',   tUp);
-t.card.addEventListener('mousedown',  e=>tDown(e.clientX));
-window.addEventListener('mousemove', e=>tMove(e.clientX));
+t.card.addEventListener('mousedown',  e=>tDown(e.clientX, e.clientY));
+window.addEventListener('mousemove', e=>tMove(e.clientX, e.clientY));
 window.addEventListener('mouseup',   tUp);
 
 window.addEventListener('keydown', e=>{
-  if(mode!=='train') return;
+  if(mode!=='train' || tNoteOpen) return;
   if(t.results.classList.contains('show')) return;
-  if(e.key==='ArrowRight'||e.key==='g'||e.key==='G') tChoose(true);
-  if(e.key==='ArrowLeft' ||e.key==='b'||e.key==='B') tChoose(false);
+  if(e.key==='ArrowRight'||e.key==='g'||e.key==='G') tChoose('good');
+  if(e.key==='ArrowLeft' ||e.key==='b'||e.key==='B') tChoose('bad');
+  if(e.key==='ArrowUp'   ||e.key==='m'||e.key==='M') tChoose('maybe');
 });
 
 /* ---------- tabs ---------- */
