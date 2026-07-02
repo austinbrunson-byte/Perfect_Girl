@@ -95,6 +95,33 @@
     background:linear-gradient(180deg,var(--pink2),var(--pink));cursor:pointer;box-shadow:0 12px 30px rgba(255,79,154,.35)}
   .again:active{transform:scale(.97)}
   footer{text-align:center;font-size:10px;color:rgba(199,155,176,.6);margin-top:14px;letter-spacing:1px}
+
+  /* ---- tabs ---- */
+  [hidden]{display:none !important}
+  .tabs{display:flex;gap:8px;justify-content:center;margin:12px 0 2px;flex:0 0 auto}
+  .tab{appearance:none;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:var(--dim);
+    font-weight:800;font-size:11px;letter-spacing:2px;text-transform:uppercase;padding:8px 18px;border-radius:99px;
+    cursor:pointer;transition:background .15s ease,color .15s ease,border-color .15s ease}
+  .tab.active{background:linear-gradient(180deg,var(--pink2),var(--pink));color:#2a0316;border-color:transparent}
+  #playView,#trainView{flex:1 1 auto;display:flex;flex-direction:column;min-height:0}
+
+  /* ---- train card ---- */
+  .card.text-only{position:relative}
+  .card.text-only .prompt{min-height:290px;display:flex;flex-direction:column;justify-content:center;padding:30px 26px}
+  .card.text-only .lead{font-size:17px;margin-bottom:10px}
+  .card.text-only .issue{font-size:23px;line-height:1.36}
+
+  /* ---- train results / export ---- */
+  .exportbtns{display:flex;gap:10px;margin:14px 0 4px}
+  .btn.ghost{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);box-shadow:none;color:var(--ink);
+    padding:13px 10px;font-size:14px}
+  .btn.ghost:active{transform:scale(.96)}
+  .again.ghost2{background:rgba(255,255,255,.06);color:var(--ink);box-shadow:none;margin-top:10px}
+  .linkbtn{background:none;border:none;color:var(--pink2);font:inherit;cursor:pointer;text-decoration:underline;padding:0}
+  .tlists{text-align:left;max-height:230px;overflow-y:auto;margin:14px 0 4px;display:flex;flex-direction:column;gap:14px}
+  .tlist-h{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--pink2);margin-bottom:4px;
+    position:sticky;top:0;background:var(--bg2);padding:4px 0}
+  .tlist-i{font-size:13px;line-height:1.4;color:var(--ink);padding:5px 2px;border-bottom:1px solid rgba(255,255,255,.05)}
 </style>
 </head>
 <body>
@@ -104,6 +131,12 @@
       <div class="sub">Would you still say yes?</div>
     </header>
 
+    <div class="tabs">
+      <button class="tab active" data-mode="play">Play</button>
+      <button class="tab" data-mode="train">Train</button>
+    </div>
+
+    <section id="playView">
     <div class="bar"><i id="fill"></i></div>
     <div class="count" id="count"></div>
 
@@ -141,6 +174,45 @@
       <button class="btn yes" id="btnYes"><span class="ico">♥</span> Yes</button>
     </div>
     <div class="hint" id="hint">Tap Yes or No · or swipe the card</div>
+    </section>
+
+    <section id="trainView" hidden>
+      <div class="bar"><i id="tfill"></i></div>
+      <div class="count" id="tcount"></div>
+
+      <div class="stage">
+        <div class="card text-only in" id="tcard">
+          <div class="stamp yes" id="tStampGood">Good</div>
+          <div class="stamp no" id="tStampBad">Bad</div>
+          <div class="prompt">
+            <div class="lead">Perfect girl, but…</div>
+            <div class="issue" id="tissue"></div>
+          </div>
+        </div>
+
+        <div class="results" id="tresults">
+          <div class="verdict">Your ratings</div>
+          <div class="rrow">
+            <div class="stat"><b id="tGood">0</b><span>good</span></div>
+            <div class="stat"><b id="tBad">0</b><span>bad</span></div>
+            <div class="stat"><b id="tRest">0</b><span>unrated</span></div>
+          </div>
+          <div class="exportbtns">
+            <button class="btn ghost" id="tCopy">Copy JSON</button>
+            <button class="btn ghost" id="tDownload">Download</button>
+          </div>
+          <div class="tlists" id="tlists"></div>
+          <button class="again" id="tResume">Rate again</button>
+          <button class="again ghost2" id="tReset">Reset ratings</button>
+        </div>
+      </div>
+
+      <div class="btns" id="tbtns">
+        <button class="btn no" id="btnBad"><span class="ico">✕</span> Bad</button>
+        <button class="btn yes" id="btnGood"><span class="ico">♥</span> Good</button>
+      </div>
+      <div class="hint" id="thint">Swipe or tap · right = good, left = bad · <button class="linkbtn" id="tExport">see ratings ▸</button></div>
+    </section>
     <footer>Photos via Unsplash</footer>
   </div>
 
@@ -402,10 +474,185 @@ window.addEventListener('mouseup',   up);
 
 /* keyboard */
 window.addEventListener('keydown', e=>{
+  if(mode!=='play') return;
   if(els.results.classList.contains('show')) return;
   if(e.key==='ArrowRight'||e.key==='y'||e.key==='Y') choose(true);
   if(e.key==='ArrowLeft' ||e.key==='n'||e.key==='N') choose(false);
 });
+
+/* ================= Train mode ================= */
+/* Swipe the prompts themselves as good/bad to curate the bank. Ratings persist
+   in localStorage and export as JSON to inform future questions. */
+let mode = 'play';
+
+const t = {
+  card: document.getElementById('tcard'), issue: document.getElementById('tissue'),
+  fill: document.getElementById('tfill'), count: document.getElementById('tcount'),
+  results: document.getElementById('tresults'),
+  stampGood: document.getElementById('tStampGood'), stampBad: document.getElementById('tStampBad'),
+  btns: document.getElementById('tbtns'), hint: document.getElementById('thint'),
+  good: document.getElementById('tGood'), bad: document.getElementById('tBad'),
+  rest: document.getElementById('tRest'), lists: document.getElementById('tlists'),
+  copy: document.getElementById('tCopy'), download: document.getElementById('tDownload'),
+  resume: document.getElementById('tResume'), reset: document.getElementById('tReset'),
+  exportLink: document.getElementById('tExport')
+};
+
+const LS_KEY = 'pg_train_ratings_v1';
+function loadRatings(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)) || {}; } catch(e){ return {}; } }
+function saveRatings(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(tRatings)); } catch(e){} }
+
+let tRatings = loadRatings();
+let tDeck = ISSUES.slice();
+let tIdx = 0, tInited = false;
+
+function tRatedCount(){ return tDeck.reduce((n,x)=> n + (tRatings[x] ? 1 : 0), 0); }
+
+function tRender(){
+  const total = tDeck.length, cur = tDeck[tIdx];
+  t.fill.style.width = (tIdx/total*100) + '%';
+  t.count.textContent = 'Question ' + (tIdx+1) + ' of ' + total + ' · ' + tRatedCount() + ' rated'
+    + (tRatings[cur] ? ' · currently ' + tRatings[cur] : '');
+  t.issue.textContent = cur;
+  t.card.classList.remove('out-yes','out-no','in');
+  void t.card.offsetWidth;
+  t.card.classList.add('in');
+  t.card.style.transform=''; t.card.style.opacity='';
+  t.stampGood.style.opacity=0; t.stampBad.style.opacity=0;
+}
+
+function tChoose(good){
+  const cur = tDeck[tIdx];
+  tRatings[cur] = good ? 'good' : 'bad';
+  saveRatings();
+  t.card.classList.remove('in');
+  t.card.classList.add(good ? 'out-yes' : 'out-no');
+  setTimeout(()=>{ tIdx++; if(tIdx >= tDeck.length) tFinish(); else tRender(); }, 300);
+}
+
+function tCards(){
+  t.results.classList.remove('show');
+  t.card.style.display=''; t.btns.style.display=''; t.hint.style.display='';
+  tRender();
+}
+
+function tFinish(){
+  t.card.style.display='none'; t.btns.style.display='none'; t.hint.style.display='none';
+  t.fill.style.width='100%';
+  t.count.textContent = 'Ratings so far';
+  tUpdateResults();
+  t.results.classList.add('show');
+}
+
+function tStart(){
+  tRatings = loadRatings();
+  tDeck = ISSUES.slice();
+  const i = tDeck.findIndex(x=>!tRatings[x]);
+  if(i < 0){ tIdx = tDeck.length; tFinish(); }   // everything already rated
+  else { tIdx = i; tCards(); }                    // resume at first unrated
+}
+
+function tListEl(title, arr){
+  const wrap = document.createElement('div'); wrap.className = 'tlist';
+  const h = document.createElement('div'); h.className = 'tlist-h';
+  h.textContent = title + ' (' + arr.length + ')'; wrap.appendChild(h);
+  arr.forEach(x=>{ const p = document.createElement('div'); p.className = 'tlist-i'; p.textContent = x; wrap.appendChild(p); });
+  return wrap;
+}
+
+function tUpdateResults(){
+  const good = tDeck.filter(x=>tRatings[x]==='good');
+  const bad  = tDeck.filter(x=>tRatings[x]==='bad');
+  t.good.textContent = good.length;
+  t.bad.textContent = bad.length;
+  t.rest.textContent = tDeck.length - good.length - bad.length;
+  t.lists.innerHTML = '';
+  t.lists.appendChild(tListEl('Good', good));
+  t.lists.appendChild(tListEl('Bad', bad));
+}
+
+function tPayload(){
+  const good = tDeck.filter(x=>tRatings[x]==='good');
+  const bad  = tDeck.filter(x=>tRatings[x]==='bad');
+  return {
+    ratedAt: new Date().toISOString(),
+    counts: { good: good.length, bad: bad.length, unrated: tDeck.length-good.length-bad.length, total: tDeck.length },
+    good, bad, ratings: tRatings
+  };
+}
+
+function tFlash(btn, msg){ const o = btn.textContent; btn.textContent = msg; setTimeout(()=>{ btn.textContent = o; }, 1200); }
+
+t.copy.addEventListener('click', async ()=>{
+  const json = JSON.stringify(tPayload(), null, 2);
+  try { await navigator.clipboard.writeText(json); tFlash(t.copy, 'Copied ✓'); }
+  catch(e){
+    const ta = document.createElement('textarea'); ta.value = json;
+    ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); tFlash(t.copy, 'Copied ✓'); } catch(_){ tFlash(t.copy, 'Copy failed'); }
+    ta.remove();
+  }
+});
+
+t.download.addEventListener('click', ()=>{
+  const json = JSON.stringify(tPayload(), null, 2);
+  const blob = new Blob([json], { type:'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'perfect-girl-ratings.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(a.href);
+});
+
+t.resume.addEventListener('click', ()=>{ tIdx = 0; tCards(); });
+t.reset.addEventListener('click', ()=>{
+  if(confirm('Clear all saved ratings?')){ tRatings = {}; saveRatings(); tStart(); }
+});
+t.exportLink.addEventListener('click', tFinish);
+
+document.getElementById('btnGood').addEventListener('click', ()=>tChoose(true));
+document.getElementById('btnBad').addEventListener('click', ()=>tChoose(false));
+
+/* train swipe */
+let tDrag=false, tSX=0, tDX=0;
+function tDown(x){ tDrag=true; tSX=x; tDX=0; t.card.style.transition='none'; }
+function tMove(x){
+  if(!tDrag) return;
+  tDX = x - tSX;
+  t.card.style.transform = 'translateX('+tDX+'px) rotate('+(tDX*0.05)+'deg)';
+  t.stampGood.style.opacity = tDX > 0 ? Math.min(tDX/90,1) : 0;
+  t.stampBad.style.opacity  = tDX < 0 ? Math.min(-tDX/90,1) : 0;
+}
+function tUp(){
+  if(!tDrag) return;
+  tDrag=false; t.card.style.transition='';
+  if(Math.abs(tDX) > 90){ tChoose(tDX > 0); }
+  else { t.card.style.transform=''; t.stampGood.style.opacity=0; t.stampBad.style.opacity=0; }
+}
+t.card.addEventListener('touchstart', e=>tDown(e.touches[0].clientX), {passive:true});
+t.card.addEventListener('touchmove',  e=>tMove(e.touches[0].clientX), {passive:true});
+t.card.addEventListener('touchend',   tUp);
+t.card.addEventListener('mousedown',  e=>tDown(e.clientX));
+window.addEventListener('mousemove', e=>tMove(e.clientX));
+window.addEventListener('mouseup',   tUp);
+
+window.addEventListener('keydown', e=>{
+  if(mode!=='train') return;
+  if(t.results.classList.contains('show')) return;
+  if(e.key==='ArrowRight'||e.key==='g'||e.key==='G') tChoose(true);
+  if(e.key==='ArrowLeft' ||e.key==='b'||e.key==='B') tChoose(false);
+});
+
+/* ---------- tabs ---------- */
+function setMode(m){
+  mode = m;
+  document.querySelectorAll('.tab').forEach(b=> b.classList.toggle('active', b.dataset.mode===m));
+  document.getElementById('playView').hidden  = (m!=='play');
+  document.getElementById('trainView').hidden = (m!=='train');
+  document.querySelector('.sub').textContent = (m==='train')
+    ? 'Rate the questions — good or bad' : 'Would you still say yes?';
+  if(m==='train' && !tInited){ tInited = true; tStart(); }
+}
+document.querySelectorAll('.tab').forEach(b=> b.addEventListener('click', ()=> setMode(b.dataset.mode)));
 
 start();
 </script>
