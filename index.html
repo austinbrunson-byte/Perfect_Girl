@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Perfect Girl">
+<meta name="theme-color" content="#12040c">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="mask-icon" href="icon.svg" color="#ff4f9a">
+<title>Perfect Girl</title>
+<style>
+  :root{
+    --bg:#12040c; --bg2:#1c0812; --card:#221019; --ink:#fff4f8; --dim:#c79bb0;
+    --pink:#ff4f9a; --pink2:#ff86bd; --green:#2fd16a; --red:#ff3b5c; --gold:#ffd23f;
+    --disp:"Georgia","Times New Roman",serif;
+    --body:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0;height:100%}
+  body{
+    background:radial-gradient(120% 90% at 50% -10%,#3a0f26 0%,var(--bg2) 45%,var(--bg) 100%);
+    color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased;
+    min-height:100dvh;overflow-x:hidden;
+  }
+  .wrap{max-width:480px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 14px) 16px calc(env(safe-area-inset-bottom) + 18px);min-height:100dvh;display:flex;flex-direction:column}
+
+  /* ---- header ---- */
+  header{text-align:center;margin-bottom:8px;flex:0 0 auto}
+  .logo{font-family:var(--disp);font-weight:700;font-size:30px;letter-spacing:.5px;line-height:1;
+    background:linear-gradient(180deg,#fff 0%,var(--pink2) 60%,var(--pink) 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 2px 22px rgba(255,79,154,.35)}
+  .logo .heart{-webkit-text-fill-color:var(--pink);filter:drop-shadow(0 0 8px rgba(255,79,154,.6))}
+  .sub{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--dim);margin-top:6px}
+
+  /* ---- progress ---- */
+  .bar{height:5px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden;margin:12px 2px 4px}
+  .bar > i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--pink),var(--gold));transition:width .35s ease}
+  .count{font-size:11px;color:var(--dim);text-align:center;letter-spacing:1px;margin-bottom:10px}
+
+  /* ---- card ---- */
+  .stage{flex:1 1 auto;display:flex;align-items:center;justify-content:center;position:relative}
+  .card{
+    width:100%;background:linear-gradient(180deg,var(--card),#190b12);
+    border:1px solid rgba(255,255,255,.08);border-radius:26px;overflow:hidden;
+    box-shadow:0 24px 60px rgba(0,0,0,.55),0 0 0 1px rgba(255,79,154,.08) inset;
+    transition:transform .32s cubic-bezier(.2,.7,.3,1),opacity .32s ease;
+    will-change:transform,opacity;
+  }
+  .card.out-yes{transform:translateX(120%) rotate(14deg);opacity:0}
+  .card.out-no{transform:translateX(-120%) rotate(-14deg);opacity:0}
+  .card.in{animation:pop .4s cubic-bezier(.2,.8,.3,1)}
+  @keyframes pop{from{transform:scale(.94) translateY(10px);opacity:0}to{transform:none;opacity:1}}
+
+  .photo{position:relative;width:100%;aspect-ratio:4/5;background:#2a1420 center/cover no-repeat}
+  .photo img{width:100%;height:100%;object-fit:cover;display:block}
+  .photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(18,4,12,0) 45%,rgba(18,4,12,.9) 100%)}
+  .badge{position:absolute;top:12px;left:12px;z-index:2;background:rgba(255,79,154,.92);color:#2a0316;
+    font-weight:800;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;padding:5px 11px;border-radius:99px;backdrop-filter:blur(4px)}
+  .stamp{position:absolute;top:18px;z-index:3;font-family:var(--disp);font-weight:800;font-size:34px;letter-spacing:2px;
+    text-transform:uppercase;padding:4px 14px;border:4px solid;border-radius:12px;opacity:0;transform:rotate(-16deg) scale(1.2);transition:opacity .12s}
+  .stamp.yes{right:16px;color:var(--green);border-color:var(--green);text-shadow:0 2px 10px rgba(47,209,106,.4)}
+  .stamp.no{left:16px;color:var(--red);border-color:var(--red);text-shadow:0 2px 10px rgba(255,59,92,.4)}
+
+  .prompt{padding:16px 20px 20px}
+  .lead{font-family:var(--disp);font-style:italic;color:var(--pink2);font-size:16px;margin-bottom:4px}
+  .issue{font-size:20px;line-height:1.32;font-weight:600}
+
+  /* ---- buttons ---- */
+  .btns{display:flex;gap:14px;margin-top:16px;flex:0 0 auto}
+  .btn{flex:1;border:none;border-radius:18px;padding:16px 10px;font-size:16px;font-weight:800;letter-spacing:.5px;
+    cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;
+    box-shadow:0 10px 26px rgba(0,0,0,.4);transition:transform .08s ease,filter .15s ease}
+  .btn:active{transform:scale(.95)}
+  .btn .ico{font-size:20px}
+  .btn.no{background:linear-gradient(180deg,#ff506e,#d21e3d)}
+  .btn.yes{background:linear-gradient(180deg,#3ee07b,#1fae56)}
+  .hint{text-align:center;font-size:11px;color:var(--dim);margin-top:12px;letter-spacing:.5px}
+
+  /* ---- results ---- */
+  .results{display:none;text-align:center;padding:8px 4px 0;animation:pop .5s ease}
+  .results.show{display:block}
+  .verdict{font-family:var(--disp);font-size:26px;font-weight:700;line-height:1.15;margin:6px 0 4px;
+    background:linear-gradient(180deg,#fff,var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .big{font-family:var(--disp);font-weight:800;font-size:72px;line-height:1;margin:10px 0 2px;color:var(--gold);text-shadow:0 4px 24px rgba(255,210,63,.35)}
+  .biglabel{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--dim)}
+  .rblurb{font-size:15px;line-height:1.5;color:var(--ink);margin:16px auto;max-width:340px}
+  .rrow{display:flex;gap:12px;justify-content:center;margin:18px 0 6px}
+  .stat{flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:12px 6px;max-width:130px}
+  .stat b{display:block;font-size:26px;font-family:var(--disp)}
+  .stat span{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--dim)}
+  .again{margin-top:22px;width:100%;border:none;border-radius:18px;padding:16px;font-size:16px;font-weight:800;color:#2a0316;
+    background:linear-gradient(180deg,var(--pink2),var(--pink));cursor:pointer;box-shadow:0 12px 30px rgba(255,79,154,.35)}
+  .again:active{transform:scale(.97)}
+  footer{text-align:center;font-size:10px;color:rgba(199,155,176,.6);margin-top:14px;letter-spacing:1px}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo">Perfect Girl <span class="heart">♥</span></div>
+      <div class="sub">Would you still say yes?</div>
+    </header>
+
+    <div class="bar"><i id="fill"></i></div>
+    <div class="count" id="count"></div>
+
+    <div class="stage">
+      <!-- swiping deck -->
+      <div class="card in" id="card">
+        <div class="photo">
+          <div class="badge">Perfect Girl</div>
+          <div class="stamp yes" id="stampYes">Yes</div>
+          <div class="stamp no" id="stampNo">No</div>
+          <img id="photo" alt="Perfect girl" src="">
+        </div>
+        <div class="prompt">
+          <div class="lead">Perfect girl, but…</div>
+          <div class="issue" id="issue"></div>
+        </div>
+      </div>
+
+      <!-- results -->
+      <div class="results" id="results">
+        <div class="big" id="roachPct">0%</div>
+        <div class="biglabel">roach tolerance</div>
+        <div class="verdict" id="verdict"></div>
+        <div class="rblurb" id="rblurb"></div>
+        <div class="rrow">
+          <div class="stat"><b id="sYes">0</b><span>said yes</span></div>
+          <div class="stat"><b id="sNo">0</b><span>said no</span></div>
+        </div>
+        <button class="again" id="again">Find her again ♥</button>
+      </div>
+    </div>
+
+    <div class="btns" id="btns">
+      <button class="btn no" id="btnNo"><span class="ico">✕</span> No</button>
+      <button class="btn yes" id="btnYes"><span class="ico">♥</span> Yes</button>
+    </div>
+    <div class="hint" id="hint">Tap Yes or No · or swipe the card</div>
+    <footer>Photos via Unsplash · A very serious compatibility test</footer>
+  </div>
+
+<script>
+/* Free-to-use portrait photos (Unsplash License). */
+const PHOTOS = [
+  "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
+  "https://images.unsplash.com/photo-1438761681033-6461ffad8d80",
+  "https://images.unsplash.com/photo-1544005313-94ddf0286df2",
+  "https://images.unsplash.com/photo-1517841905240-472988babdf9",
+  "https://images.unsplash.com/photo-1524250502761-1ac6f2e30d43",
+  "https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb",
+  "https://images.unsplash.com/photo-1509967419530-da38b4704bc6",
+  "https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453",
+  "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91",
+  "https://images.unsplash.com/photo-1531123897727-8f129e1688ce",
+  "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f",
+  "https://images.unsplash.com/photo-1534528741775-53994a69daeb"
+];
+const IMG_Q = "?auto=format&fit=crop&w=640&h=800&q=80";
+// tiny inline fallback if a photo fails to load
+const FALLBACK = "data:image/svg+xml;utf8," + encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" width="640" height="800"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff86bd"/><stop offset="1" stop-color="#3a0f26"/></linearGradient></defs><rect width="640" height="800" fill="url(#g)"/><text x="320" y="420" font-size="120" text-anchor="middle" fill="#fff4f8">♥</text></svg>'
+);
+
+/* The prompts — mostly roach related, as nature intended. */
+const ISSUES = [
+  "every time she flushes the toilet, a roach spawns somewhere in the house.",
+  "for one minute every month she turns into a roach. At random.",
+  "she can telepathically command every roach within a five-mile radius.",
+  "whenever she laughs, a single roach politely falls out of her sleeve.",
+  "she keeps a pet roach named Gerald, and Gerald has a seat at the dinner table.",
+  "she refuses to kill roaches and instead gives them names, jobs, and performance reviews.",
+  "when startled, she hisses exactly like a Madagascar hissing roach.",
+  "she has a hidden third set of tiny legs. They are roach legs. They are load-bearing.",
+  "she can flatten herself to slide under the bedroom door at 3 a.m. for no reason.",
+  "her whole extended family reunion is held in the wall behind the fridge.",
+  "she glows faintly under UV light, and so do the roaches quietly following her.",
+  "every text she sends autocorrects exactly one word to \"roach.\"",
+  "she can only fall asleep to the gentle skittering of roaches in the walls.",
+  "she doubles in number the instant you turn the lights off. Then re-merges. Usually.",
+  "every anniversary a roach hand-delivers her card. It waits for a tip.",
+  "she molts twice a year. On the good couch. Your good couch.",
+  "she can fit through a gap the width of a nickel when she's really motivated.",
+  "she has antennae, but they only come out when she's genuinely happy with you.",
+  "she orders for \"the whole colony\" at restaurants, and the colony shows up.",
+  "she'd survive a nuclear blast — but, y'know, entirely because of the roach thing.",
+  "every kiss tastes faintly of the inside of a kitchen cabinet.",
+  "she can smell an open bag of chips from four rooms away and is already there.",
+  "she introduces the roaches to you by name at parties and expects you to remember them.",
+  "she has strong, unshakeable opinions about which crumbs are 'the good crumbs.'",
+  // a couple non-roach curveballs
+  "she has read your entire search history and has taken detailed notes.",
+  "she says \"expresso,\" with full confidence and unbroken eye contact, forever."
+];
+
+/* ---------- shuffle & state ---------- */
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
+let deck, photoDeck, idx, yes, no;
+
+const els = {
+  card:document.getElementById('card'), photo:document.getElementById('photo'),
+  issue:document.getElementById('issue'), fill:document.getElementById('fill'),
+  count:document.getElementById('count'), stampYes:document.getElementById('stampYes'),
+  stampNo:document.getElementById('stampNo'), btns:document.getElementById('btns'),
+  hint:document.getElementById('hint'), results:document.getElementById('results'),
+  roachPct:document.getElementById('roachPct'), verdict:document.getElementById('verdict'),
+  rblurb:document.getElementById('rblurb'), sYes:document.getElementById('sYes'),
+  sNo:document.getElementById('sNo')
+};
+
+function start(){
+  deck = shuffle(ISSUES);
+  photoDeck = shuffle(PHOTOS);
+  idx = 0; yes = 0; no = 0;
+  els.results.classList.remove('show');
+  els.card.style.display = '';
+  els.btns.style.display = '';
+  els.hint.style.display = '';
+  render();
+}
+
+function render(){
+  const total = deck.length;
+  els.fill.style.width = (idx/total*100) + '%';
+  els.count.textContent = 'Prospect ' + (idx+1) + ' of ' + total;
+  els.issue.textContent = deck[idx];
+  const src = photoDeck[idx % photoDeck.length] + IMG_Q;
+  els.photo.onerror = () => { els.photo.onerror = null; els.photo.src = FALLBACK; };
+  els.photo.src = src;
+  els.card.classList.remove('out-yes','out-no','in');
+  void els.card.offsetWidth;      // reflow to restart animation
+  els.card.classList.add('in');
+  els.card.style.transform = '';
+  els.card.style.opacity = '';
+  els.stampYes.style.opacity = 0;
+  els.stampNo.style.opacity = 0;
+}
+
+function choose(said){
+  if(said){ yes++; } else { no++; }
+  els.card.classList.remove('in');
+  els.card.classList.add(said ? 'out-yes' : 'out-no');
+  setTimeout(() => {
+    idx++;
+    if(idx >= deck.length){ finish(); }
+    else { render(); }
+  }, 300);
+}
+
+function finish(){
+  els.card.style.display = 'none';
+  els.btns.style.display = 'none';
+  els.hint.style.display = 'none';
+  const total = yes + no;
+  const pct = Math.round(yes/total*100);
+  els.fill.style.width = '100%';
+  els.count.textContent = 'Results are in';
+  els.roachPct.textContent = pct + '%';
+  els.sYes.textContent = yes;
+  els.sNo.textContent = no;
+
+  let verdict, blurb;
+  if(pct === 100){
+    verdict = "Unconditional love. Get her a ring (and an EpiPen).";
+    blurb = "You said yes to every single flaw. The roaches have accepted you as one of their own. Congratulations, you monster in love.";
+  } else if(pct >= 75){
+    verdict = "You'd move in. You'd caulk the baseboards, but you'd move in.";
+    blurb = "Deeply in love and only slightly itchy. You see past the antennae to the woman underneath. Mostly woman.";
+  } else if(pct >= 50){
+    verdict = "It's complicated. Beautiful, but crunchy.";
+    blurb = "You're on the fence, and the fence has roaches on it. Half of you is smitten, half of you keeps a shoe by the bed.";
+  } else if(pct >= 25){
+    verdict = "You've got standards. Cruel, cruel standards.";
+    blurb = "A few deal-breakers turned into most deal-breakers. Perfect girl deserves someone who doesn't scream. Keep looking.";
+  } else {
+    verdict = "Single by choice. The choice being 'not a roach.'";
+    blurb = "You rejected nearly everything. Perfect girl was right there and you brought a can of Raid to the first date. Alone, but pest-free.";
+  }
+  els.verdict.textContent = verdict;
+  els.rblurb.textContent = blurb;
+  els.results.classList.add('show');
+}
+
+/* ---------- input: buttons ---------- */
+document.getElementById('btnYes').addEventListener('click', () => choose(true));
+document.getElementById('btnNo').addEventListener('click', () => choose(false));
+document.getElementById('again').addEventListener('click', start);
+
+/* ---------- input: swipe ---------- */
+let dragging=false, startX=0, dx=0;
+const stage = els.card;
+function down(x){ dragging=true; startX=x; dx=0; els.card.style.transition='none'; }
+function move(x){
+  if(!dragging) return;
+  dx = x - startX;
+  els.card.style.transform = 'translateX('+dx+'px) rotate('+(dx*0.05)+'deg)';
+  els.stampYes.style.opacity = dx > 0 ? Math.min(dx/90,1) : 0;
+  els.stampNo.style.opacity  = dx < 0 ? Math.min(-dx/90,1) : 0;
+}
+function up(){
+  if(!dragging) return;
+  dragging=false;
+  els.card.style.transition='';
+  if(Math.abs(dx) > 90){ choose(dx > 0); }
+  else { els.card.style.transform=''; els.stampYes.style.opacity=0; els.stampNo.style.opacity=0; }
+}
+stage.addEventListener('touchstart', e=>down(e.touches[0].clientX), {passive:true});
+stage.addEventListener('touchmove',  e=>move(e.touches[0].clientX), {passive:true});
+stage.addEventListener('touchend',   up);
+stage.addEventListener('mousedown',  e=>down(e.clientX));
+window.addEventListener('mousemove', e=>move(e.clientX));
+window.addEventListener('mouseup',   up);
+
+/* keyboard */
+window.addEventListener('keydown', e=>{
+  if(els.results.classList.contains('show')) return;
+  if(e.key==='ArrowRight'||e.key==='y'||e.key==='Y') choose(true);
+  if(e.key==='ArrowLeft' ||e.key==='n'||e.key==='N') choose(false);
+});
+
+start();
+</script>
+</body>
+</html>
