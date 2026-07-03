@@ -220,7 +220,7 @@
             <button class="btn ghost" id="tDownload">Download</button>
           </div>
           <div class="tlists" id="tlists"></div>
-          <button class="again" id="tResume">Rate again</button>
+          <button class="again" id="tResume">Review all</button>
           <button class="again ghost2" id="tReset">Reset ratings</button>
         </div>
       </div>
@@ -329,6 +329,43 @@ const ISSUES = [
   "she has forty thousand dollars of debt.",
   "she has three cats and is getting a fourth.",
   "she always takes phone calls on speaker in public.",
+
+  /* ---------- roaches (batch 2) ---------- */
+  "5% of the time you kiss her, you feel a roach turn over under her tongue.",
+  "her purse contains one roach at all times.",
+  "one in twenty of her sneezes launches a roach across the room.",
+  "a single roach lives in her navel.",
+  "her tears carry roach eggs.",
+  "3% of the time you share fries, one of them is a roach.",
+  "her ponytail is held by a roach, not an elastic.",
+  "she keeps a roach in her bra for warmth.",
+  "2% of the time she feeds you off her fork, the bite is a roach.",
+  "1% of the time, one of her earrings is a roach.",
+  "spooning her means a roach is spooning you.",
+  "the crumbs in her bed reassemble overnight into one roach.",
+  "she flosses with a roach leg.",
+  "her nail clippings are roach shell.",
+  "one of her eyelashes, if it lands on your cheek, walks off.",
+  "1% of her wine glasses finish with a roach at the bottom.",
+  "when she scratches your back, one of the fingers is a roach.",
+  "a roach lives in the gap between her front teeth.",
+  "her mascara wand comes out of the tube with legs 2% of the time.",
+  "half the rice at your wedding will be roach.",
+  "she warms her hands on a roach in her coat pocket.",
+  "when she whispers in your ear, a roach steps onto your lobe.",
+  "her beauty mark is a roach, and it moves.",
+  "her shampoo dispenses a roach 5% of the time.",
+  "she stirs her coffee with a live roach.",
+  "her lipstick leaves a print with six legs.",
+
+  /* ---------- Shaq / The General / ordinary (batch 2) ---------- */
+  "she can dunk. There is no hoop; she dunks anyway.",
+  "she turns sideways to fit through doorways.",
+  "she recites your deductible in her sleep.",
+  "she quotes you a lower rate every time you brake hard.",
+  "she claps when the plane lands.",
+  "she calls you by her ex’s name and does not notice.",
+  "she replies to texts three days later, if at all.",
 ];
 
 /* ---------- shuffle & state ---------- */
@@ -498,12 +535,12 @@ let tRatings = loadRatings();
 let tDeck = ISSUES.slice();
 let tIdx = 0, tInited = false, tNoteOpen = false;
 
-function tRatedCount(){ return tDeck.reduce((n,x)=> n + (tV(x) ? 1 : 0), 0); }
+function tRatedCount(){ return ISSUES.reduce((n,x)=> n + (tV(x) ? 1 : 0), 0); }
 
 function tRender(){
   const total = tDeck.length, cur = tDeck[tIdx];
   t.fill.style.width = (tIdx/total*100) + '%';
-  t.count.textContent = 'Question ' + (tIdx+1) + ' of ' + total + ' · ' + tRatedCount() + ' rated'
+  t.count.textContent = 'Question ' + (tIdx+1) + ' of ' + total + ' · ' + tRatedCount() + '/' + ISSUES.length + ' rated'
     + (tV(cur) ? ' · currently ' + tV(cur) : '');
   t.issue.textContent = cur;
   t.card.classList.remove('out-yes','out-no','out-up','in');
@@ -559,17 +596,23 @@ function tFinish(){
   tCloseNote();
   t.card.style.display='none'; t.btns.style.display='none'; t.hint.style.display='none';
   t.fill.style.width='100%';
-  t.count.textContent = 'Ratings so far';
+  const left = ISSUES.filter(x=>!tV(x)).length;
+  t.count.textContent = (left===0 ? 'All caught up' : left + ' still unrated')
+    + ' · ' + tRatedCount() + '/' + ISSUES.length + ' rated';
   tUpdateResults();
   t.results.classList.add('show');
 }
 
-function tStart(){
+function tStart(){                 // default session: only the untrained questions
+  tRatings = loadRatings();
+  tDeck = ISSUES.filter(x=>!tV(x));
+  if(tDeck.length === 0){ tIdx = 0; tFinish(); }  // nothing new to rate
+  else { tIdx = 0; tCards(); }
+}
+function tReviewAll(){             // walk the whole bank to revise earlier calls
   tRatings = loadRatings();
   tDeck = ISSUES.slice();
-  const i = tDeck.findIndex(x=>!tV(x));
-  if(i < 0){ tIdx = tDeck.length; tFinish(); }   // everything already rated
-  else { tIdx = i; tCards(); }                    // resume at first unrated
+  tIdx = 0; tCards();
 }
 
 function tListEl(title, arr, withNotes){
@@ -584,13 +627,13 @@ function tListEl(title, arr, withNotes){
 }
 
 function tUpdateResults(){
-  const good  = tDeck.filter(x=>tV(x)==='good');
-  const maybe = tDeck.filter(x=>tV(x)==='maybe');
-  const bad   = tDeck.filter(x=>tV(x)==='bad');
+  const good  = ISSUES.filter(x=>tV(x)==='good');
+  const maybe = ISSUES.filter(x=>tV(x)==='maybe');
+  const bad   = ISSUES.filter(x=>tV(x)==='bad');
   t.good.textContent = good.length;
   t.maybe.textContent = maybe.length;
   t.bad.textContent = bad.length;
-  t.rest.textContent = tDeck.length - good.length - maybe.length - bad.length;
+  t.rest.textContent = ISSUES.length - good.length - maybe.length - bad.length;
   t.lists.innerHTML = '';
   t.lists.appendChild(tListEl('Good', good, false));
   t.lists.appendChild(tListEl('Maybe', maybe, true));
@@ -598,13 +641,13 @@ function tUpdateResults(){
 }
 
 function tPayload(){
-  const good  = tDeck.filter(x=>tV(x)==='good');
-  const bad   = tDeck.filter(x=>tV(x)==='bad');
-  const maybe = tDeck.filter(x=>tV(x)==='maybe').map(x=>({ text:x, note: tN(x) }));
+  const good  = ISSUES.filter(x=>tV(x)==='good');
+  const bad   = ISSUES.filter(x=>tV(x)==='bad');
+  const maybe = ISSUES.filter(x=>tV(x)==='maybe').map(x=>({ text:x, note: tN(x) }));
   return {
     ratedAt: new Date().toISOString(),
     counts: { good: good.length, maybe: maybe.length, bad: bad.length,
-              unrated: tDeck.length - good.length - maybe.length - bad.length, total: tDeck.length },
+              unrated: ISSUES.length - good.length - maybe.length - bad.length, total: ISSUES.length },
     good, maybe, bad, ratings: tRatings
   };
 }
@@ -631,7 +674,7 @@ t.download.addEventListener('click', ()=>{
   URL.revokeObjectURL(a.href);
 });
 
-t.resume.addEventListener('click', ()=>{ tIdx = 0; tCards(); });
+t.resume.addEventListener('click', tReviewAll);
 t.reset.addEventListener('click', ()=>{
   if(confirm('Clear all saved ratings?')){ tRatings = {}; saveRatings(); tStart(); }
 });
