@@ -49,7 +49,16 @@ the repo — **read `index.html` first** before making changes.
   silent switch mutes everything. Sad/No **voice** clips not yet provided.
 - **Layout:** locked to `100dvh`, no page scroll; `html{background}` set so no white
   bar shows. Keep it that way.
-- **Photos:** `const PHOTOS = [...]` — 25 Unsplash portrait URLs, all women.
+- **Photos:** `const PHOTOS_GIRL = [...]` — 25 Unsplash portrait URLs, all women;
+  `const PHOTOS_GUY = [...]` — 24 male portraits. `let PHOTOS` points at the active one.
+- **Girl / Guy swap:** a `⇄` button top-left of the header toggles `subject` between
+  `girl` and `guy` (persists in `localStorage` `pg_subject`). Guy is a mirror: blue
+  theme (CSS vars swap via `:root[data-subject="guy"]`), male photos, and a separate
+  bank `ISSUES_GUY` — the ordinary human dealbreakers pronoun-flipped to *him*, with
+  every roach / Shaq / The General prompt removed (~73). Each subject has its own
+  ratings + profile localStorage keys and its own `SEED_*`. All of it is driven by the
+  `SUBJECTS` config + `applySubject()`; the You axis labels/flavor come from there too
+  (girl: impossible/ordinary; guy: red flags/little things).
 
 **My usual workflow — I'll do one of these:**
 1. Paste an exported **ratings JSON** → keep `good` verbatim + **bake into

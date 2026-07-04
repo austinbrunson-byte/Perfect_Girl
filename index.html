@@ -15,16 +15,21 @@
 <title>Perfect Girl</title>
 <style>
   :root{
-    --bg:#12040c; --bg2:#1c0812; --card:#221019; --ink:#fff4f8; --dim:#c79bb0;
-    --pink:#ff4f9a; --pink2:#ff86bd; --green:#2fd16a; --red:#ff3b5c; --gold:#ffd23f;
+    --bg:#12040c; --bg2:#1c0812; --bg-glow:#3a0f26; --card:#221019; --ink:#fff4f8; --dim:#c79bb0;
+    --pink:#ff4f9a; --pink2:#ff86bd; --pink-rgb:255,79,154; --green:#2fd16a; --red:#ff3b5c; --gold:#ffd23f;
     --disp:"Georgia","Times New Roman",serif;
     --body:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  }
+  /* Perfect Guy — the same world in blue. Swapped by data-subject on <html>. */
+  :root[data-subject="guy"]{
+    --bg:#050a13; --bg2:#0a1524; --bg-glow:#123c60; --card:#101a26;
+    --pink:#3f8cff; --pink2:#84b6ff; --pink-rgb:63,140,255;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{margin:0;padding:0;height:100%}
   html{background:var(--bg)}
   body{
-    background:radial-gradient(120% 90% at 50% -10%,#3a0f26 0%,var(--bg2) 45%,var(--bg) 100%);
+    background:radial-gradient(120% 90% at 50% -10%,var(--bg-glow) 0%,var(--bg2) 45%,var(--bg) 100%);
     color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased;
     height:100dvh;overflow:hidden;overscroll-behavior:none;
   }
@@ -38,10 +43,15 @@
     transition:transform .08s ease,background .15s ease}
   .soundbtn:active{transform:scale(.9)}
   .soundbtn.off{opacity:.55}
+  .swapbtn{position:absolute;top:-2px;left:0;height:36px;padding:0 12px;border-radius:99px;
+    border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:var(--ink);
+    font-size:15px;font-weight:800;letter-spacing:.5px;line-height:1;cursor:pointer;
+    display:flex;align-items:center;gap:4px;transition:transform .08s ease,background .15s ease}
+  .swapbtn:active{transform:scale(.92)}
   .logo{font-family:var(--disp);font-weight:700;font-size:30px;letter-spacing:.5px;line-height:1;
     background:linear-gradient(180deg,#fff 0%,var(--pink2) 60%,var(--pink) 100%);
-    -webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 2px 22px rgba(255,79,154,.35)}
-  .logo .heart{-webkit-text-fill-color:var(--pink);filter:drop-shadow(0 0 8px rgba(255,79,154,.6))}
+    -webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 2px 22px rgba(var(--pink-rgb),.35)}
+  .logo .heart{-webkit-text-fill-color:var(--pink);filter:drop-shadow(0 0 8px rgba(var(--pink-rgb),.6))}
   .sub{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--dim);margin-top:6px}
 
   /* ---- progress ---- */
@@ -55,7 +65,7 @@
     width:100%;height:100%;max-height:100%;display:flex;flex-direction:column;
     background:linear-gradient(180deg,var(--card),#190b12);
     border:1px solid rgba(255,255,255,.08);border-radius:26px;overflow:hidden;
-    box-shadow:0 24px 60px rgba(0,0,0,.55),0 0 0 1px rgba(255,79,154,.08) inset;
+    box-shadow:0 24px 60px rgba(0,0,0,.55),0 0 0 1px rgba(var(--pink-rgb),.08) inset;
     transition:transform .32s cubic-bezier(.2,.7,.3,1),opacity .32s ease;
     will-change:transform,opacity;
   }
@@ -67,7 +77,7 @@
   .photo{position:relative;width:100%;flex:1 1 auto;min-height:0;background:#2a1420 center/cover no-repeat}
   .photo img{width:100%;height:100%;object-fit:cover;display:block}
   .photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(18,4,12,0) 45%,rgba(18,4,12,.9) 100%)}
-  .badge{position:absolute;top:12px;left:12px;z-index:2;background:rgba(255,79,154,.92);color:#2a0316;
+  .badge{position:absolute;top:12px;left:12px;z-index:2;background:rgba(var(--pink-rgb),.92);color:#2a0316;
     font-weight:800;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;padding:5px 11px;border-radius:99px;backdrop-filter:blur(4px)}
   .stamp{position:absolute;top:18px;z-index:3;font-family:var(--disp);font-weight:800;font-size:34px;letter-spacing:2px;
     text-transform:uppercase;padding:4px 14px;border:4px solid;border-radius:12px;opacity:0;transform:rotate(-16deg) scale(1.2);transition:opacity .12s}
@@ -102,7 +112,7 @@
   .stat b{display:block;font-size:26px;font-family:var(--disp)}
   .stat span{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--dim)}
   .again{margin-top:22px;width:100%;border:none;border-radius:18px;padding:16px;font-size:16px;font-weight:800;color:#2a0316;
-    background:linear-gradient(180deg,var(--pink2),var(--pink));cursor:pointer;box-shadow:0 12px 30px rgba(255,79,154,.35)}
+    background:linear-gradient(180deg,var(--pink2),var(--pink));cursor:pointer;box-shadow:0 12px 30px rgba(var(--pink-rgb),.35)}
   .again:active{transform:scale(.97)}
   footer{text-align:center;font-size:10px;color:rgba(199,155,176,.6);margin-top:8px;letter-spacing:1px;flex:0 0 auto}
 
@@ -112,8 +122,8 @@
   .arche-emoji{font-size:56px;line-height:1;margin-top:2px}
   .archetype{font-family:var(--disp);font-size:30px;font-weight:800;line-height:1.12;margin:6px 0 2px;
     background:linear-gradient(180deg,#fff,var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent}
-  .look{background:linear-gradient(180deg,rgba(255,79,154,.12),rgba(255,79,154,.04));
-    border:1px solid rgba(255,79,154,.25);border-radius:18px;padding:15px 17px;margin:18px auto 4px;max-width:360px;text-align:left}
+  .look{background:linear-gradient(180deg,rgba(var(--pink-rgb),.12),rgba(var(--pink-rgb),.04));
+    border:1px solid rgba(var(--pink-rgb),.25);border-radius:18px;padding:15px 17px;margin:18px auto 4px;max-width:360px;text-align:left}
   .look-h{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--pink2);margin-bottom:8px}
   .look-b{font-size:15px;line-height:1.5;color:var(--ink)}
   .quote{font-family:var(--disp);font-style:italic;color:var(--pink2);font-size:14px;line-height:1.5;margin:16px auto 4px;max-width:340px}
@@ -166,8 +176,9 @@
 <body>
   <div class="wrap">
     <header>
+      <button id="swapBtn" class="swapbtn" aria-label="Switch subject" title="Switch">⇄ ♂</button>
       <button id="soundBtn" class="soundbtn" aria-label="Toggle sound" title="Toggle sound">🔊</button>
-      <div class="logo">Perfect Girl <span class="heart">♥</span></div>
+      <div class="logo"><span id="logoText">Perfect Girl</span> <span class="heart">♥</span></div>
       <div class="sub">Would you still say yes?</div>
     </header>
 
@@ -276,8 +287,8 @@
         <div class="biglabel" id="ySub">your type</div>
         <div class="rblurb" id="yBlurb"></div>
         <div class="rrow">
-          <div class="stat"><b id="yRoach">–</b><span>impossible</span></div>
-          <div class="stat"><b id="yHuman">–</b><span>ordinary</span></div>
+          <div class="stat"><b id="yRoach">–</b><span id="yRoachLbl">impossible</span></div>
+          <div class="stat"><b id="yHuman">–</b><span id="yHumanLbl">ordinary</span></div>
           <div class="stat"><b id="yAns">0</b><span>answered</span></div>
         </div>
         <div class="look">
@@ -294,7 +305,7 @@
 
 <script>
 /* Bump on every push so you can tell which build is live (shown in the footer). */
-const APP_VERSION = "v2.8 · 2026-07-04";
+const APP_VERSION = "v2.9 · 2026-07-04";
 document.getElementById('ver').textContent = APP_VERSION + ' · ';
 
 /* ================= cute sound fx ================= */
@@ -377,8 +388,8 @@ soundBtn.addEventListener('click', ()=>{
 });
 renderSound();
 
-/* Free-to-use portrait photos (Unsplash License). */
-const PHOTOS = [
+/* Free-to-use portrait photos (Unsplash License). Girl deck. */
+const PHOTOS_GIRL = [
   "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
   "https://images.unsplash.com/photo-1438761681033-6461ffad8d80",
   "https://images.unsplash.com/photo-1544005313-94ddf0286df2",
@@ -405,6 +416,34 @@ const PHOTOS = [
   "https://images.unsplash.com/photo-1483985988355-763728e1935b",
   "https://images.unsplash.com/photo-1499887142886-791eca5918cd"
 ];
+/* Guy deck (Unsplash License). */
+const PHOTOS_GUY = [
+  "https://images.unsplash.com/photo-1500648767791-00dcc994a43e",
+  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
+  "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d",
+  "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7",
+  "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce",
+  "https://images.unsplash.com/photo-1463453091185-61582044d556",
+  "https://images.unsplash.com/photo-1504257432389-52343af06ae3",
+  "https://images.unsplash.com/photo-1508243771214-6e95d137426b",
+  "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e",
+  "https://images.unsplash.com/photo-1488161628813-04466f872be2",
+  "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79",
+  "https://images.unsplash.com/photo-1489980557514-251d61e3eeb6",
+  "https://images.unsplash.com/photo-1500051638674-ff996a0ec29e",
+  "https://images.unsplash.com/photo-1507591064344-4c6ce005b128",
+  "https://images.unsplash.com/photo-1519345182560-3f2917c472ef",
+  "https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f",
+  "https://images.unsplash.com/photo-1534030347209-467a5b0ad3e6",
+  "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde",
+  "https://images.unsplash.com/photo-1502720705749-3c3fd0e8c9d8",
+  "https://images.unsplash.com/photo-1509305717900-84f40e786d82",
+  "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61",
+  "https://images.unsplash.com/photo-1568602471122-7832951cc4c5",
+  "https://images.unsplash.com/photo-1504593811423-6dd665756598",
+  "https://images.unsplash.com/photo-1557862921-37829c790f19"
+];
+let PHOTOS = PHOTOS_GIRL;
 const IMG_Q = "?auto=format&fit=crop&w=640&h=800&q=80";
 // inline fallback if a photo fails to load — varied per card so a deck of
 // placeholders (e.g. offline) still looks intentional rather than broken.
@@ -419,7 +458,7 @@ function fallbackFor(i){
 /* The prompts. One register only: deadpan — flat, specific, stated as fact.
    About two-thirds involve roaches; the rest are Shaq, The General, and
    ordinary dealbreakers. No punchlines, no winks, nothing that announces itself. */
-const ISSUES = [
+const ISSUES_GIRL = [
   /* ---------- roaches (~62%) ---------- */
   "every time she flushes the toilet, a roach spawns somewhere in the house.",
   "for one minute every month she turns into a roach. At random.",
@@ -625,6 +664,86 @@ const ISSUES = [
   "her pillow smells faintly of the inside of a rental car.",
 ];
 
+/* Perfect Guy bank — a mirror of the girl bank with every roach / Shaq /
+   The General prompt removed, and the rest flipped to him. Ordinary human
+   dealbreakers only. */
+const ISSUES_GUY = [
+  "he bites his nails. All ten. Including that one.",
+  "he has never once been on time.",
+  "he keeps the apartment at 61 degrees year-round and will not negotiate.",
+  "he narrates every movie you watch together, start to finish.",
+  "he is close with his mother. They speak nine times a day.",
+  "he corrects your grammar in front of other people.",
+  "he leaves wet towels on the bed every morning.",
+  "he chews with his mouth open.",
+  "he has forty thousand dollars of debt.",
+  "he has three cats and is getting a fourth.",
+  "he always takes phone calls on speaker in public.",
+  "he claps when the plane lands.",
+  "he calls you by his ex’s name and does not notice.",
+  "he replies to texts three days later, if at all.",
+  "he texts his ex good morning, every morning.",
+  "he gasps audibly when you pay full price.",
+  "he leaves his location on and checks yours.",
+  "he keeps a screenshot of every argument you have ever had.",
+  "he says he is five minutes away when he has not left the house.",
+  "he keeps his ex’s hoodie and wears it to bed.",
+  "he reads your texts over your shoulder as you type them.",
+  "he splits every bill to the exact cent, yours included.",
+  "he keeps a running list of everything you have done wrong.",
+  "he drives the gas tank to empty and never once refills it.",
+  "he leaves every cabinet door in the kitchen open.",
+  "he has to have the last word in every disagreement.",
+  "he brings up your ex in every argument.",
+  "he keeps the television on all night to fall asleep.",
+  "he double-texts and then calls if you do not reply within a minute.",
+  "he leaves his wet laundry in the machine for days.",
+  "he takes an hour to answer a yes-or-no question.",
+  "he has a different story about how you met for every friend.",
+  "he has never once apologized first.",
+  "he flosses in bed, nightly, facing you.",
+  "he scores every meal you cook out of ten and has never given above a six.",
+  "he does not tip, and he tells the server why.",
+  "he still shares a phone plan with his ex.",
+  "he laughs at funerals. Every funeral.",
+  "your toothbrush is wet when you get home, and he denies it.",
+  "he has a storage unit he will not discuss.",
+  "he requests half the cost of any gift he gives you, about a week later.",
+  "he texts your mother more than you do.",
+  "he sets nine alarms starting at 5 a.m. and wakes for none of them.",
+  "he has a second phone and will not say what it is for.",
+  "he can fall asleep instantly, but only during arguments.",
+  "you have heard him rehearsing arguments with you through the bathroom door.",
+  "he keeps a packed suitcase by the door and changes the subject when asked.",
+  "he drives ten under the limit, in the left lane, with cruise control on.",
+  "he reads ahead in whatever book you are reading and spoils it.",
+  "he introduces you to everyone as his girlfriend for now.",
+  "he palms watermelons at the grocery store to test ripeness.",
+  "he has four ex-fiancées and is on good terms with all of them.",
+  "he clips his toenails on the couch, mid-movie.",
+  "he maintains a spreadsheet ranking your friends.",
+  "he takes two forty-five-minute showers a day.",
+  "there is a note in your phone titled ring size, and he keeps it current.",
+  "he cries during arguments strategically and admits it afterward.",
+  "you regularly wake to find him already awake, watching you.",
+  "he knows all your passwords. You never gave them to him.",
+  "he answers your phone when it rings, from anywhere in the apartment.",
+  "he is banned from three casinos in two states.",
+  "he does not lock doors, on principle.",
+  "he invites his ex to every event you host.",
+  "he brings his therapist’s verdicts into your arguments.",
+  "he has planned your funeral and revises it when you annoy him.",
+  "he cheats at board games against you, for no stakes.",
+  "he gives away your belongings to guests who admire them.",
+  "he rearranges your furniture while you sleep.",
+  "his phone dies by 4 p.m. every day and stays dead until morning.",
+  "he returns every gift you give him for store credit.",
+  "his hands are always the temperature of a basement floor.",
+  "he wakes you most nights to ask if you heard that. There is never anything.",
+  "his pillow smells faintly of the inside of a rental car.",
+];
+let ISSUES = ISSUES_GIRL;
+
 /* ---------- shuffle & state ---------- */
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
 let deck, photoDeck, idx, yes, no;
@@ -797,7 +916,7 @@ const t = {
 };
 
 /* ratings shape: { [prompt]: { verdict:'good'|'bad'|'maybe', note:'' } } */
-const LS_KEY = 'pg_train_ratings_v2';
+let LS_KEY = 'pg_train_ratings_v2';
 function loadRatings(){
   try{ const v2 = JSON.parse(localStorage.getItem(LS_KEY)); if(v2) return v2; }catch(e){}
   try{  // migrate v1 (string verdicts, no notes)
@@ -814,7 +933,7 @@ function tN(x){ const r = tRatings[x]; return (r && r.note) || ''; }
    Merged in on load (without overwriting anything already decided locally) so
    trained state ships with the app and survives cache clears, re-added Home
    Screen icons, and new devices. Regenerate this from a Copy JSON export. */
-const SEED_RATINGS = {
+const SEED_GIRL = {
   "every time she flushes the toilet, a roach spawns somewhere in the house.": {verdict:"good",note:""},
   "for one minute every month she turns into a roach. At random.": {verdict:"good",note:""},
   "every text she sends autocorrects exactly one word to \"roach.\"": {verdict:"good",note:""},
@@ -902,13 +1021,10 @@ const SEED_RATINGS = {
   "she double-texts and then calls if you do not reply within a minute.": {verdict:"good",note:""},
   "she leaves her wet laundry in the machine for days.": {verdict:"good",note:""},
 };
+const SEED_GUY = {};                 // guy ratings ship unvetted; Play serves the whole bank until trained
+let SEED_RATINGS = SEED_GIRL;        // swapped per subject by applySubject()
 
-let tRatings = loadRatings();
-(function seedRatings(){
-  let changed = false;
-  for(const k in SEED_RATINGS){ if(!tRatings[k]){ tRatings[k] = SEED_RATINGS[k]; changed = true; } }
-  if(changed) saveRatings();
-})();
+let tRatings = {};                   // populated by applySubject() (loads + merges the subject's seed)
 let tDeck = ISSUES.slice();
 let tIdx = 0, tInited = false, tNoteOpen = false;
 const T_BATCH = 30;   // rate this many new prompts per Train session
@@ -1149,15 +1265,15 @@ window.addEventListener('keydown', e=>{
    (accumulated across sessions in localStorage) and sorts them into two
    axes — tolerance for the roaches vs. tolerance for ordinary human
    flaws — then names a type and, deadpan, tells you where to look. */
-const PROFILE_KEY = 'pg_profile_v1';
+let PROFILE_KEY = 'pg_profile_v1';   // swapped per subject by applySubject()
 function loadProfile(){ try{ return JSON.parse(localStorage.getItem(PROFILE_KEY)) || {}; }catch(e){ return {}; } }
 function saveProfile(p){ try{ localStorage.setItem(PROFILE_KEY, JSON.stringify(p)); }catch(e){} }
 function recordAnswer(prompt, said){
   const p = loadProfile();
-  const roach = /roach/i.test(prompt);
+  const a = SUBJECT.axisTest(prompt);   // axis A vs axis B for the current subject
   p.total = (p.total||0) + 1;
-  if(said){ const k = roach?'yesRoach':'yesHuman'; p[k] = (p[k]||0)+1; p.aYes = prompt; }
-  else    { const k = roach?'noRoach':'noHuman';   p[k] = (p[k]||0)+1; p.aNo  = prompt; }
+  if(said){ const k = a?'yesRoach':'yesHuman'; p[k] = (p[k]||0)+1; p.aYes = prompt; }
+  else    { const k = a?'noRoach':'noHuman';   p[k] = (p[k]||0)+1; p.aNo  = prompt; }
   saveProfile(p);
 }
 
@@ -1165,6 +1281,7 @@ const y = {
   emoji:document.getElementById('yEmoji'), type:document.getElementById('yType'),
   sub:document.getElementById('ySub'), blurb:document.getElementById('yBlurb'),
   roach:document.getElementById('yRoach'), human:document.getElementById('yHuman'),
+  roachLbl:document.getElementById('yRoachLbl'), humanLbl:document.getElementById('yHumanLbl'),
   ans:document.getElementById('yAns'), look:document.getElementById('yLook'),
   quote:document.getElementById('yQuote'), foot:document.getElementById('yFoot'),
   again:document.getElementById('yAgain')
@@ -1173,7 +1290,7 @@ const y = {
 /* base type from your overall yes-rate; ordered high → low */
 const BANDS = [
   { min:0.85, emoji:'😇', name:'The Unconditional',
-    desc:'Almost nothing disqualifies a person for you. You looked at the impossible and the inconvenient alike and stayed put.',
+    desc:'Almost nothing disqualifies a person for you. You looked at the worst in a person and the merely annoying alike and stayed put.',
     look:'Anywhere with people in it. You are not the filter — you have taken yourself out of the way. So go outside; the rest is logistics.' },
   { min:0.6, emoji:'🩷', name:'The Forgiving',
     desc:'You say yes more than no. You accept that a whole person arrives with some freight, and you carry it without much complaint.',
@@ -1201,6 +1318,8 @@ function renderYou(){
   y.ans.textContent   = answered;
   y.roach.textContent = roachPct==null ? '–' : roachPct + '%';
   y.human.textContent = humanPct==null ? '–' : humanPct + '%';
+  y.roachLbl.textContent = SUBJECT.axisLabels.a;
+  y.humanLbl.textContent = SUBJECT.axisLabels.b;
 
   if(answered === 0){
     y.emoji.textContent = '❔';
@@ -1220,9 +1339,9 @@ function renderYou(){
   let flavor = '';
   if(roachPct!=null && humanPct!=null){
     const gap = humanPct - roachPct;
-    if(gap >= 25)       flavor = ' You will forgive almost any human failing, but the impossible is where you quietly draw the line.';
-    else if(gap <= -25) flavor = ' The impossible you take in stride; it is the small human stuff — the clinginess, the money, the exes — that actually ends it.';
-    else                flavor = ' You do not sort your dealbreakers by kind. A flaw is a flaw.';
+    if(gap >= 25)       flavor = SUBJECT.flavor.high;
+    else if(gap <= -25) flavor = SUBJECT.flavor.low;
+    else                flavor = SUBJECT.flavor.mid;
   }
 
   y.emoji.textContent = band.emoji;
@@ -1259,7 +1378,70 @@ function setMode(m){
 }
 document.querySelectorAll('.tab').forEach(b=> b.addEventListener('click', ()=> setMode(b.dataset.mode)));
 
-start();
+/* ================= Girl / Guy subject swap =================
+   Two parallel worlds. The guy bank drops every roach / Shaq / The General
+   prompt and flips the rest to him; theme goes blue; photos and ratings and
+   the You-profile all scope to their own localStorage keys. */
+const RED_FLAG = /\bex\b|ex['’]|argument|password|second phone|storage unit|packed suitcase|watching you|already awake|rehears|therapist|screenshot|last word|casino|banned|does not lock|answers your phone|checks yours|spreadsheet|funeral|cries|apolog|gives away your|rearranges your|knows all your|running list|five minutes away|denies it|ring size|introduces you|different story|phone plan/i;
+
+const SUBJECTS = {
+  girl: {
+    title:'Perfect Girl', themeColor:'#12040c', swapLabel:'⇄ ♂', swapTitle:'Switch to Perfect Guy',
+    bank:ISSUES_GIRL, seed:SEED_GIRL, photos:PHOTOS_GIRL,
+    lsRatings:'pg_train_ratings_v2', lsProfile:'pg_profile_v1',
+    axisTest:(p)=>/roach/i.test(p), axisLabels:{a:'impossible', b:'ordinary'},
+    flavor:{
+      high:' You will forgive almost any human failing, but the impossible is where you quietly draw the line.',
+      low:' The impossible you take in stride; it is the small human stuff — the clinginess, the money, the exes — that actually ends it.',
+      mid:' You do not sort your dealbreakers by kind. A flaw is a flaw.'
+    }
+  },
+  guy: {
+    title:'Perfect Guy', themeColor:'#050a13', swapLabel:'⇄ ♀', swapTitle:'Switch to Perfect Girl',
+    bank:ISSUES_GUY, seed:SEED_GUY, photos:PHOTOS_GUY,
+    lsRatings:'pg_train_ratings_guy_v1', lsProfile:'pg_profile_guy_v1',
+    axisTest:(p)=>RED_FLAG.test(p), axisLabels:{a:'red flags', b:'little things'},
+    flavor:{
+      high:' You will overlook almost any small habit, but a real red flag is where you are out.',
+      low:' The red flags you somehow live with; it is the small daily habits that actually undo you.',
+      mid:' You do not rank your dealbreakers by size. A flaw is a flaw.'
+    }
+  }
+};
+let SUBJECT = SUBJECTS.girl;
+
+function applySubject(sub){
+  SUBJECT = SUBJECTS[sub];
+  ISSUES = SUBJECT.bank; SEED_RATINGS = SUBJECT.seed; PHOTOS = SUBJECT.photos;
+  LS_KEY = SUBJECT.lsRatings; PROFILE_KEY = SUBJECT.lsProfile;
+  try{ localStorage.setItem('pg_subject', sub); }catch(e){}
+
+  // load this subject's ratings and merge its baked seed (never overwriting local)
+  tRatings = loadRatings();
+  let changed = false;
+  for(const k in SEED_RATINGS){ if(!tRatings[k]){ tRatings[k] = SEED_RATINGS[k]; changed = true; } }
+  if(changed) saveRatings();
+
+  // theme + chrome
+  document.documentElement.setAttribute('data-subject', sub);
+  document.getElementById('logoText').textContent = SUBJECT.title;
+  document.title = SUBJECT.title;
+  const tc = document.querySelector('meta[name="theme-color"]'); if(tc){ tc.setAttribute('content', SUBJECT.themeColor); }
+  const sb = document.getElementById('swapBtn'); sb.textContent = SUBJECT.swapLabel; sb.title = SUBJECT.swapTitle;
+
+  // re-init the current view against the new bank
+  tInited = false; tDeck = ISSUES.slice(); tIdx = 0;
+  if(mode==='train'){ tInited = true; tStart(); }
+  else if(mode==='you'){ renderYou(); }
+  else { start(); }
+}
+document.getElementById('swapBtn').addEventListener('click', ()=>{
+  applySubject(SUBJECT === SUBJECTS.girl ? 'guy' : 'girl');
+});
+
+let initSubject = 'girl';
+try{ const s = localStorage.getItem('pg_subject'); if(s === 'guy' || s === 'girl') initSubject = s; }catch(e){}
+applySubject(initSubject);
 </script>
 </body>
 </html>
