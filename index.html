@@ -250,7 +250,7 @@
 
 <script>
 /* Bump on every push so you can tell which build is live (shown in the footer). */
-const APP_VERSION = "v1.5 · 2026-07-04";
+const APP_VERSION = "v1.6 · 2026-07-04";
 document.getElementById('ver').textContent = APP_VERSION + ' · ';
 
 /* Free-to-use portrait photos (Unsplash License). */
@@ -585,6 +585,7 @@ function tN(x){ const r = tRatings[x]; return (r && r.note) || ''; }
 let tRatings = loadRatings();
 let tDeck = ISSUES.slice();
 let tIdx = 0, tInited = false, tNoteOpen = false;
+const T_BATCH = 30;   // rate this many new prompts per Train session
 
 function tRatedCount(){ return ISSUES.reduce((n,x)=> n + (tV(x) ? 1 : 0), 0); }
 
@@ -650,13 +651,15 @@ function tFinish(){
   const left = ISSUES.filter(x=>!tV(x)).length;
   t.count.textContent = (left===0 ? 'All caught up' : left + ' still unrated')
     + ' · ' + tRatedCount() + '/' + ISSUES.length + ' rated';
+  if(left > 0){ t.resume.textContent = 'Rate ' + Math.min(T_BATCH, left) + ' more new ▸'; t.resume.onclick = tStart; }
+  else { t.resume.textContent = 'Review all'; t.resume.onclick = tReviewAll; }
   tUpdateResults();
   t.results.classList.add('show');
 }
 
-function tStart(){                 // default session: only the untrained questions
+function tStart(){                 // default session: the next batch of untrained questions
   tRatings = loadRatings();
-  tDeck = ISSUES.filter(x=>!tV(x));
+  tDeck = ISSUES.filter(x=>!tV(x)).slice(0, T_BATCH);
   if(tDeck.length === 0){ tIdx = 0; tFinish(); }  // nothing new to rate
   else { tIdx = 0; tCards(); }
 }
@@ -725,7 +728,6 @@ t.download.addEventListener('click', ()=>{
   URL.revokeObjectURL(a.href);
 });
 
-t.resume.addEventListener('click', tReviewAll);
 t.reset.addEventListener('click', ()=>{
   if(confirm('Clear all saved ratings?')){ tRatings = {}; saveRatings(); tStart(); }
 });
