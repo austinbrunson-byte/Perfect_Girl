@@ -259,7 +259,7 @@
 
 <script>
 /* Bump on every push so you can tell which build is live (shown in the footer). */
-const APP_VERSION = "v2.5 · 2026-07-04";
+const APP_VERSION = "v2.6 · 2026-07-04";
 document.getElementById('ver').textContent = APP_VERSION + ' · ';
 
 /* ================= cute sound fx ================= */
@@ -606,7 +606,10 @@ const els = {
 };
 
 function start(){
-  deck = shuffle(ISSUES);
+  // Play only serves prompts vetted "good" in Train; untrained/rejected ones
+  // stay in Train. Fall back to the whole bank only if nothing is rated yet.
+  const vetted = ISSUES.filter(x => tV(x) === 'good');
+  deck = shuffle(vetted.length ? vetted : ISSUES);
   photoDeck = shuffle(PHOTOS);
   idx = 0; yes = 0; no = 0;
   els.results.classList.remove('show');
