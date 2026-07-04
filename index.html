@@ -276,8 +276,8 @@
         <div class="biglabel" id="ySub">your type</div>
         <div class="rblurb" id="yBlurb"></div>
         <div class="rrow">
-          <div class="stat"><b id="yRoach">–</b><span>roach-proof</span></div>
-          <div class="stat"><b id="yHuman">–</b><span>flaw-proof</span></div>
+          <div class="stat"><b id="yRoach">–</b><span>impossible</span></div>
+          <div class="stat"><b id="yHuman">–</b><span>ordinary</span></div>
           <div class="stat"><b id="yAns">0</b><span>answered</span></div>
         </div>
         <div class="look">
@@ -294,7 +294,7 @@
 
 <script>
 /* Bump on every push so you can tell which build is live (shown in the footer). */
-const APP_VERSION = "v2.7 · 2026-07-04";
+const APP_VERSION = "v2.8 · 2026-07-04";
 document.getElementById('ver').textContent = APP_VERSION + ' · ';
 
 /* ================= cute sound fx ================= */
@@ -1173,7 +1173,7 @@ const y = {
 /* base type from your overall yes-rate; ordered high → low */
 const BANDS = [
   { min:0.85, emoji:'😇', name:'The Unconditional',
-    desc:'Almost nothing disqualifies a person for you. You looked at infestation and inconvenience alike and stayed put.',
+    desc:'Almost nothing disqualifies a person for you. You looked at the impossible and the inconvenient alike and stayed put.',
     look:'Anywhere with people in it. You are not the filter — you have taken yourself out of the way. So go outside; the rest is logistics.' },
   { min:0.6, emoji:'🩷', name:'The Forgiving',
     desc:'You say yes more than no. You accept that a whole person arrives with some freight, and you carry it without much complaint.',
@@ -1220,9 +1220,9 @@ function renderYou(){
   let flavor = '';
   if(roachPct!=null && humanPct!=null){
     const gap = humanPct - roachPct;
-    if(gap >= 25)       flavor = ' Your line is the roaches: cosmic infestation is where you are out, but ordinary human failure you can sit with.';
-    else if(gap <= -25) flavor = ' Oddly, the literal roaches do not move you — it is the human stuff, the clinginess and the money and the exes, that ends it.';
-    else                flavor = ' You do not sort your dealbreakers by type. A flaw is a flaw, roach or not.';
+    if(gap >= 25)       flavor = ' You will forgive almost any human failing, but the impossible is where you quietly draw the line.';
+    else if(gap <= -25) flavor = ' The impossible you take in stride; it is the small human stuff — the clinginess, the money, the exes — that actually ends it.';
+    else                flavor = ' You do not sort your dealbreakers by kind. A flaw is a flaw.';
   }
 
   y.emoji.textContent = band.emoji;
