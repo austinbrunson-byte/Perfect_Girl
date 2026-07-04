@@ -42,7 +42,12 @@ the repo — **read `index.html` first** before making changes.
 - **Play only serves prompts vetted `good`** (seed + local ratings); untrained /
   rejected prompts stay in Train only. Falls back to the whole bank if nothing is
   rated.
-- **Sound:** a 🔊 toggle in the header (persists in `localStorage` `pg_sound`).
+- **Sound is girl-side only.** The anime-girl voice clips + cute synth chimes don't fit
+  the guy world, so `playHappy/playSad/playMaybe` no-op when `subjectKey==='guy'`, the
+  header 🔊 button is hidden, and the Account "Sound" row is hidden. All restore on girl.
+- **Exports are labeled by subject:** `tPayload()` includes `subject`/`subjectLabel`, and
+  Download names the file `perfect-<girl|guy>-ratings.json`.
+- **Sound (girl):** a 🔊 toggle in the header (persists in `localStorage` `pg_sound`).
   Yes/Good plays a **random** real voice clip from `sfx/` (synth chime fallback);
   No/Bad and Maybe are synthesized Web Audio chimes. iOS: clips play inside the tap
   gesture (no readyState gating) with a one-time muted-play unlock; the hardware
@@ -55,8 +60,10 @@ the repo — **read `index.html` first** before making changes.
   `girl` and `guy` (persists in `localStorage` `pg_subject`). Guy is a mirror: blue
   theme (CSS vars swap via `:root[data-subject="guy"]`), male photos, and a separate
   bank `ISSUES_GUY` — the ordinary human dealbreakers pronoun-flipped to *him*, with
-  every roach / Shaq / The General prompt removed (~73). Each subject has its own
-  ratings + profile localStorage keys and its own `SEED_*`. All of it is driven by the
+  every roach / Shaq / The General prompt removed, plus its own batch of original,
+  guy-coded dealbreakers (the boys, gaming, gym, sports, trucks, his mom/ex, ego) —
+  ~135 total, fully separate from the girl bank (no shared strings). Each subject has
+  its own ratings + profile localStorage keys and its own `SEED_*`. All of it is driven by the
   `SUBJECTS` config + `applySubject()`; the You axis labels/flavor come from there too
   (girl: impossible/ordinary; guy: red flags/little things).
 - **Matchmaker share link:** the You tab has a name field + "Share my matchmaker link"

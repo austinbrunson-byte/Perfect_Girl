@@ -400,7 +400,7 @@
             <div class="setrow"><span>Looking for</span>
               <div class="seg"><button data-set="girl" id="setGirl">Girl</button><button data-set="guy" id="setGuy">Guy</button></div>
             </div>
-            <div class="setrow"><span>Sound</span>
+            <div class="setrow" id="soundRow"><span>Sound</span>
               <button class="segbtn" id="setSound">On</button></div>
             <div class="setrow"><span>Display name</span>
               <input id="setName" class="nameinput small" type="text" maxlength="24" placeholder="Your name"></div>
@@ -433,7 +433,7 @@
 
 <script>
 /* Bump on every push so you can tell which build is live (shown in the footer). */
-const APP_VERSION = "v2.12 · 2026-07-04";
+const APP_VERSION = "v2.13 · 2026-07-04";
 document.getElementById('ver').textContent = APP_VERSION + ' · ';
 
 /* ================= cute sound fx ================= */
@@ -470,7 +470,7 @@ function synthHappy(){
 const YES_SRCS = ['sfx/yes-catgirl.mp3','sfx/yes-chuckle.mp3','sfx/yes-giggle.mp3','sfx/yes-niichan.mp3','sfx/yes-laugh.mp3'];
 const yesPool = YES_SRCS.map(src=>{ const a = new Audio(src); a.preload = 'auto'; a.volume = 0.85; return a; });
 function playHappy(){
-  if(!soundOn) return;
+  if(!soundOn || subjectKey === 'guy') return;   // the anime-girl voice / cute sfx are girl-side only
   // Always try a real clip in the tap gesture — iOS never preloads, so gating on
   // readyState would fall back to the chime forever. Fall back only if play fails.
   const a = yesPool[(Math.random()*yesPool.length)|0];
@@ -497,13 +497,13 @@ function unlockAudio(){
 }
 ['pointerdown','touchstart','keydown'].forEach(ev=> window.addEventListener(ev, unlockAudio));
 function playSad(){
-  if(!soundOn) return; const c = ac(); if(!c) return; const t = c.currentTime;
+  if(!soundOn || subjectKey === 'guy') return; const c = ac(); if(!c) return; const t = c.currentTime;
   // gentle descending minor slide — a little "aww"
   tone(440.0, t,        0.22, 'sine', 0.20, 392.0);
   tone(349.23, t + 0.16, 0.34, 'sine', 0.20, 293.66);
 }
 function playMaybe(){
-  if(!soundOn) return; const c = ac(); if(!c) return; const t = c.currentTime;
+  if(!soundOn || subjectKey === 'guy') return; const c = ac(); if(!c) return; const t = c.currentTime;
   tone(659.25, t, 0.14, 'triangle', 0.16); tone(880.0, t + 0.10, 0.18, 'triangle', 0.16);
 }
 const soundBtn = document.getElementById('soundBtn');
@@ -869,6 +869,70 @@ const ISSUES_GUY = [
   "his hands are always the temperature of a basement floor.",
   "he wakes you most nights to ask if you heard that. There is never anything.",
   "his pillow smells faintly of the inside of a rental car.",
+
+  /* ---------- guy-specific (original, non-roach) ---------- */
+  "his group chat with the boys is muted for you and no one else.",
+  "he brings a friend along to every date and has since the first one.",
+  "he leaves to help a friend move every weekend, and you have never met the friend.",
+  "he takes a call from the boys mid-argument and puts it on speaker.",
+  "he introduces you to people by your first and last name, every time.",
+  "he keeps his gaming headset on at dinner in case the boys need him.",
+  "he pauses the conversation, never the game.",
+  "he has a gaming chair in the living room and a folding chair for guests.",
+  "he ranks his online teammates above you, out loud, by name.",
+  "he plans around a raid he will not move.",
+  "he weighs his food, and yours.",
+  "he flexes in every reflective surface you pass.",
+  "he narrates his workout to you by text, set by set.",
+  "he brings his own protein to restaurants.",
+  "he calls a rest day a personal failure and says so at brunch.",
+  "he keeps a gallon jug at the dinner table and refills it, loudly.",
+  "he schedules nothing between September and February.",
+  "he has a fantasy team named after you and trades you at the deadline.",
+  "he leaves the room to check a score during your family's dinner.",
+  "he grows a playoff beard and will not trim it until a team he does not play for wins.",
+  "he talks to the truck. It has a name. It is not yours.",
+  "he revs the engine outside instead of texting that he is here.",
+  "he lets no one eat in the truck but keeps a year of receipts in the door.",
+  "he trims his beard over your sink and leaves it.",
+  "he owns one towel, for everything, and it is always damp.",
+  "he clips his nails at his desk during video calls, camera on.",
+  "he wears the same lucky socks through a playoff run, unwashed, on principle.",
+  "he reapplies the same cologne hourly from a bottle in his jacket.",
+  "he sends every photo of you to his mother first, for approval.",
+  "he compares your cooking to his mother's, out loud, with a number.",
+  "he calls his mother from the bathroom during dinner at your parents'.",
+  "he keeps a framed photo with his ex in the hallway and calls it art.",
+  "he saved his ex's number under a fake name you found.",
+  "he brings up his ex's cooking at your birthday dinner.",
+  "he Venmo-requests you for the gas it took to pick you up.",
+  "he keeps a running tab of favors on a whiteboard in the garage.",
+  "he negotiates the price of everything, including at the funeral home.",
+  "he tips in advice.",
+  "he replies to your paragraphs with a thumbs up.",
+  "he watches your stories and answers none of your texts.",
+  "he photographs every meal before you are allowed to eat.",
+  "he keeps a second Instagram you are not allowed to follow.",
+  "he live-texts your fights to a friend and reads you the replies.",
+  "he records voice memos about your arguments, for the record.",
+  "he orders for you, wrong, confidently.",
+  "he finishes your plate before you have started yours.",
+  "he double-dips, and defends it with a study.",
+  "he sets a 4:45 alarm to seize the day and snoozes until nine.",
+  "he sleeps diagonally and calls the middle his side.",
+  "he plays hustle videos to fall asleep, out loud.",
+  "he explains your own job to you at parties.",
+  "he corrects the waiter's grammar and tips accordingly.",
+  "he keeps a folder of comebacks he has not used yet.",
+  "he calls every concern you raise a phase.",
+  "he refers to your relationship as a situation when his friends are around.",
+  "he claps for himself after parallel parking.",
+  "he brings up his high school stats at your work events.",
+  "he has strong unprompted opinions about your route, your posture, and your thermostat.",
+  "he keeps score in every board game and in the relationship.",
+  "he owns four remotes and will not let you touch the good one.",
+  "he wears sunglasses indoors and removes them only to read the check.",
+  "he tells you the same story about himself weekly, as if it is new.",
 ];
 let ISSUES = ISSUES_GIRL;
 
@@ -1270,6 +1334,8 @@ function tPayload(){
   const bad   = ISSUES.filter(x=>tV(x)==='bad');
   const maybe = ISSUES.filter(x=>tV(x)==='maybe').map(x=>({ text:x, note: tN(x) }));
   return {
+    subject: subjectKey,                 // 'girl' | 'guy' — which bank these ratings are for
+    subjectLabel: SUBJECT.title,         // 'Perfect Girl' | 'Perfect Guy'
     ratedAt: new Date().toISOString(),
     counts: { good: good.length, maybe: maybe.length, bad: bad.length,
               unrated: ISSUES.length - good.length - maybe.length - bad.length, total: ISSUES.length },
@@ -1335,7 +1401,7 @@ t.download.addEventListener('click', ()=>{
   const json = JSON.stringify(tPayload(), null, 2);
   const blob = new Blob([json], { type:'application/json' });
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob); a.download = 'perfect-girl-ratings.json';
+  a.href = URL.createObjectURL(blob); a.download = 'perfect-' + subjectKey + '-ratings.json';
   document.body.appendChild(a); a.click(); a.remove();
   URL.revokeObjectURL(a.href);
 });
@@ -1696,6 +1762,7 @@ function renderAccount(){
     acct.emailShow.textContent = u.email;
     acct.setGirl.classList.toggle('on', subjectKey==='girl');
     acct.setGuy.classList.toggle('on', subjectKey==='guy');
+    document.getElementById('soundRow').hidden = (subjectKey === 'guy');   // sound is girl-side only
     acct.setSound.textContent = soundOn ? 'On' : 'Off';
     let nm = ''; try{ nm = localStorage.getItem('pg_name') || ''; }catch(e){}
     acct.setName.value = nm || u.name || '';
@@ -1770,6 +1837,7 @@ function applySubject(sub, noPersist){
   document.querySelectorAll('.lead').forEach(el => el.textContent = SUBJECT.lead);
   const tc = document.querySelector('meta[name="theme-color"]'); if(tc){ tc.setAttribute('content', SUBJECT.themeColor); }
   const sb = document.getElementById('swapBtn'); sb.textContent = SUBJECT.swapLabel; sb.title = SUBJECT.swapTitle;
+  document.getElementById('soundBtn').hidden = (sub === 'guy');   // no sound on the guy side
 
   // re-init the current view against the new bank
   tInited = false; tDeck = ISSUES.slice(); tIdx = 0;
