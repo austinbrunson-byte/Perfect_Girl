@@ -305,7 +305,7 @@
 
 <script>
 /* Bump on every push so you can tell which build is live (shown in the footer). */
-const APP_VERSION = "v2.9 · 2026-07-04";
+const APP_VERSION = "v2.10 · 2026-07-04";
 document.getElementById('ver').textContent = APP_VERSION + ' · ';
 
 /* ================= cute sound fx ================= */
@@ -1062,7 +1062,7 @@ function tChoose(verdict){
 function tOpenNote(){
   tNoteOpen = true;
   const cur = tDeck[tIdx];
-  t.noteQ.textContent = 'Perfect girl, but… ' + cur;
+  t.noteQ.textContent = SUBJECT.lead + ' ' + cur;
   t.noteText.value = tV(cur)==='maybe' ? tN(cur) : '';
   t.card.style.transition=''; t.card.style.transform='';   // snap card back into place
   t.stampGood.style.opacity=0; t.stampBad.style.opacity=0; t.stampMaybe.style.opacity=0;
@@ -1386,7 +1386,7 @@ const RED_FLAG = /\bex\b|ex['’]|argument|password|second phone|storage unit|pa
 
 const SUBJECTS = {
   girl: {
-    title:'Perfect Girl', themeColor:'#12040c', swapLabel:'⇄ ♂', swapTitle:'Switch to Perfect Guy',
+    title:'Perfect Girl', lead:'Perfect girl, but…', themeColor:'#12040c', swapLabel:'⇄ ♂', swapTitle:'Switch to Perfect Guy',
     bank:ISSUES_GIRL, seed:SEED_GIRL, photos:PHOTOS_GIRL,
     lsRatings:'pg_train_ratings_v2', lsProfile:'pg_profile_v1',
     axisTest:(p)=>/roach/i.test(p), axisLabels:{a:'impossible', b:'ordinary'},
@@ -1397,7 +1397,7 @@ const SUBJECTS = {
     }
   },
   guy: {
-    title:'Perfect Guy', themeColor:'#050a13', swapLabel:'⇄ ♀', swapTitle:'Switch to Perfect Girl',
+    title:'Perfect Guy', lead:'Perfect guy, but…', themeColor:'#050a13', swapLabel:'⇄ ♀', swapTitle:'Switch to Perfect Girl',
     bank:ISSUES_GUY, seed:SEED_GUY, photos:PHOTOS_GUY,
     lsRatings:'pg_train_ratings_guy_v1', lsProfile:'pg_profile_guy_v1',
     axisTest:(p)=>RED_FLAG.test(p), axisLabels:{a:'red flags', b:'little things'},
@@ -1426,6 +1426,8 @@ function applySubject(sub){
   document.documentElement.setAttribute('data-subject', sub);
   document.getElementById('logoText').textContent = SUBJECT.title;
   document.title = SUBJECT.title;
+  document.querySelector('.badge').textContent = SUBJECT.title;
+  document.querySelectorAll('.lead').forEach(el => el.textContent = SUBJECT.lead);
   const tc = document.querySelector('meta[name="theme-color"]'); if(tc){ tc.setAttribute('content', SUBJECT.themeColor); }
   const sb = document.getElementById('swapBtn'); sb.textContent = SUBJECT.swapLabel; sb.title = SUBJECT.swapTitle;
 
