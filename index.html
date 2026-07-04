@@ -20,6 +20,7 @@
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{margin:0;padding:0;height:100%}
+  html{background:var(--bg)}
   body{
     background:radial-gradient(120% 90% at 50% -10%,#3a0f26 0%,var(--bg2) 45%,var(--bg) 100%);
     color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased;
@@ -242,10 +243,14 @@
       </div>
       <div class="hint" id="thint">Swipe or tap · left bad · up maybe · right good · <button class="linkbtn" id="tExport">see ratings ▸</button></div>
     </section>
-    <footer>Photos via Unsplash</footer>
+    <footer><span id="ver"></span>Photos via Unsplash</footer>
   </div>
 
 <script>
+/* Bump on every push so you can tell which build is live (shown in the footer). */
+const APP_VERSION = "v1.1 · 2026-07-04";
+document.getElementById('ver').textContent = APP_VERSION + ' · ';
+
 /* Free-to-use portrait photos (Unsplash License). */
 const PHOTOS = [
   "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
