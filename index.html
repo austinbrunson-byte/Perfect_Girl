@@ -259,7 +259,7 @@
 
 <script>
 /* Bump on every push so you can tell which build is live (shown in the footer). */
-const APP_VERSION = "v2.2 · 2026-07-04";
+const APP_VERSION = "v2.3 · 2026-07-04";
 document.getElementById('ver').textContent = APP_VERSION + ' · ';
 
 /* ================= cute sound fx ================= */
@@ -286,11 +286,23 @@ function tone(freq, at, dur, type, peak, glideTo){
   o.connect(g); g.connect(c.destination);
   o.start(at); o.stop(at + dur + 0.02);
 }
-function playHappy(){
-  if(!soundOn) return; const c = ac(); if(!c) return; const t = c.currentTime;
+function synthHappy(){
+  const c = ac(); if(!c) return; const t = c.currentTime;
   // bright rising arpeggio + a sparkle on top — reads as a cheerful "yay!"
   [523.25, 659.25, 783.99, 1046.50].forEach((f,i)=> tone(f, t + i*0.07, 0.16, 'triangle', 0.22));
   tone(1318.51, t + 0.28, 0.20, 'sine', 0.14, 1568.0);
+}
+/* real anime-girl "yes" clips; a random one plays each time, synth as fallback */
+const YES_SRCS = ['sfx/yes-catgirl.mp3','sfx/yes-chuckle.mp3','sfx/yes-giggle.mp3','sfx/yes-niichan.mp3','sfx/yes-laugh.mp3'];
+const yesPool = YES_SRCS.map(src=>{ const a = new Audio(src); a.preload = 'auto'; a.volume = 0.85; return a; });
+function playHappy(){
+  if(!soundOn) return;
+  const ready = yesPool.filter(a => a.readyState >= 2);
+  if(ready.length){
+    const a = ready[(Math.random()*ready.length)|0];
+    try{ a.currentTime = 0; const pr = a.play(); if(pr && pr.catch) pr.catch(()=>{}); return; }catch(e){}
+  }
+  synthHappy();   // clips not loaded yet (e.g. first tap) — fall back to the chime
 }
 function playSad(){
   if(!soundOn) return; const c = ac(); if(!c) return; const t = c.currentTime;
