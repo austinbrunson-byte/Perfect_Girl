@@ -252,7 +252,7 @@
 
 <script>
 /* Bump on every push so you can tell which build is live (shown in the footer). */
-const APP_VERSION = "v1.7 · 2026-07-04";
+const APP_VERSION = "v1.8 · 2026-07-04";
 document.getElementById('ver').textContent = APP_VERSION + ' · ';
 
 /* Free-to-use portrait photos (Unsplash License). */
@@ -589,7 +589,63 @@ function tN(x){ const r = tRatings[x]; return (r && r.note) || ''; }
    Merged in on load (without overwriting anything already decided locally) so
    trained state ships with the app and survives cache clears, re-added Home
    Screen icons, and new devices. Regenerate this from a Copy JSON export. */
-const SEED_RATINGS = {};
+const SEED_RATINGS = {
+  "every time she flushes the toilet, a roach spawns somewhere in the house.": {verdict:"good",note:""},
+  "for one minute every month she turns into a roach. At random.": {verdict:"good",note:""},
+  "every text she sends autocorrects exactly one word to \"roach.\"": {verdict:"good",note:""},
+  "every kiss tastes faintly of the inside of a kitchen cabinet.": {verdict:"good",note:""},
+  "roaches cannot die inside her home.": {verdict:"good",note:""},
+  "ice from her freezer has a 10% roach inclusion rate.": {verdict:"good",note:""},
+  "flipping her pillow to the cool side carries a 3% chance of one roach, pressed flat, alive.": {verdict:"good",note:""},
+  "her lip balm has a 1% chance per use of one fine antenna set into the surface.": {verdict:"good",note:""},
+  "her laundry averages one live roach per 200 garments, discovered warm, during folding.": {verdict:"good",note:""},
+  "eggs she cracks contain a roach in place of the yolk at a rate of 1 in 500.": {verdict:"good",note:""},
+  "her morning breath, 4% of days, is the smell of the space behind a refrigerator.": {verdict:"good",note:""},
+  "one of her molars is a roach preserved in amber.": {verdict:"good",note:""},
+  "she keeps one roach in a terrarium named after your father.": {verdict:"good",note:""},
+  "gifts she wraps have a 5% chance of containing a roach.": {verdict:"good",note:""},
+  "4% of her hair is roach antenna.": {verdict:"good",note:""},
+  "each of her houseplants contains one roach.": {verdict:"good",note:""},
+  "once per year, one of her teeth is a roach for 11 seconds.": {verdict:"good",note:""},
+  "5% of the time you reach into her popcorn, you feel a roach.": {verdict:"good",note:""},
+  "5% of the time she asks you to unzip her dress, the zipper gets caught on a roach.": {verdict:"good",note:""},
+  "sharing a straw with her carries a 2% chance the straw slurps up a roach.": {verdict:"good",note:""},
+  "the last sip from her water bottle contains roach legs 1% of the time.": {verdict:"good",note:""},
+  "once per month a roach exits her sleeve mid-hug.": {verdict:"good",note:""},
+  "holding her hand in a dark theater carries a 2% chance a roach crosses from her sleeve to yours.": {verdict:"good",note:""},
+  "her bath towel releases one roach when unfolded, 6% of the time.": {verdict:"good",note:""},
+  "her dryer’s lint trap yields one intact roach wing per load.": {verdict:"good",note:""},
+  "5% of the time you kiss her, you feel a roach turn over under her tongue.": {verdict:"good",note:""},
+  "her purse contains one roach at all times.": {verdict:"good",note:""},
+  "one in twenty of her sneezes launches a roach across the room.": {verdict:"good",note:""},
+  "her tears carry roach eggs.": {verdict:"good",note:""},
+  "3% of the time you share fries, one of them is a roach.": {verdict:"good",note:""},
+  "2% of the time she feeds you off her fork, the bite is a roach.": {verdict:"good",note:""},
+  "her nail clippings are roach shell.": {verdict:"good",note:""},
+  "her shampoo dispenses a roach 5% of the time.": {verdict:"good",note:""},
+  "for eleven seconds each morning, she is Shaq.": {verdict:"good",note:""},
+  "she has attempted four thousand free throws in her life and made none of them.": {verdict:"good",note:""},
+  "she can hold your entire head in one hand. She does this while you are talking.": {verdict:"good",note:""},
+  "she turns sideways to fit through doorways.": {verdict:"good",note:""},
+  "at 6:14 each morning she states a monthly premium aloud, then goes back to sleep.": {verdict:"good",note:""},
+  "any time you don’t use a coupon, she turns into The General.": {verdict:"good",note:""},
+  "she recites your deductible in her sleep.": {verdict:"good",note:""},
+  "she quotes you a lower rate every time you brake hard.": {verdict:"good",note:""},
+  "she bites her nails. All ten. Including that one.": {verdict:"good",note:""},
+  "she has never once been on time.": {verdict:"good",note:""},
+  "she keeps the apartment at 61 degrees year-round and will not negotiate.": {verdict:"good",note:""},
+  "she narrates every movie you watch together, start to finish.": {verdict:"good",note:""},
+  "she is close with her mother. They speak nine times a day.": {verdict:"good",note:""},
+  "she corrects your grammar in front of other people.": {verdict:"good",note:""},
+  "she leaves wet towels on the bed every morning.": {verdict:"good",note:""},
+  "she chews with her mouth open.": {verdict:"good",note:""},
+  "she has forty thousand dollars of debt.": {verdict:"good",note:""},
+  "she has three cats and is getting a fourth.": {verdict:"good",note:""},
+  "she always takes phone calls on speaker in public.": {verdict:"good",note:""},
+  "she claps when the plane lands.": {verdict:"good",note:""},
+  "she calls you by her ex’s name and does not notice.": {verdict:"good",note:""},
+  "she replies to texts three days later, if at all.": {verdict:"good",note:""},
+};
 
 let tRatings = loadRatings();
 (function seedRatings(){
