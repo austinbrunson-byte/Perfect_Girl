@@ -31,7 +31,13 @@
   .wrap{max-width:480px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 12px) 16px calc(env(safe-area-inset-bottom) + 12px);height:100dvh;overflow:hidden;display:flex;flex-direction:column}
 
   /* ---- header ---- */
-  header{text-align:center;margin-bottom:8px;flex:0 0 auto}
+  header{text-align:center;margin-bottom:8px;flex:0 0 auto;position:relative}
+  .soundbtn{position:absolute;top:-2px;right:0;width:36px;height:36px;border-radius:50%;
+    border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:var(--ink);
+    font-size:17px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;
+    transition:transform .08s ease,background .15s ease}
+  .soundbtn:active{transform:scale(.9)}
+  .soundbtn.off{opacity:.55}
   .logo{font-family:var(--disp);font-weight:700;font-size:30px;letter-spacing:.5px;line-height:1;
     background:linear-gradient(180deg,#fff 0%,var(--pink2) 60%,var(--pink) 100%);
     -webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 2px 22px rgba(255,79,154,.35)}
@@ -147,6 +153,7 @@
 <body>
   <div class="wrap">
     <header>
+      <button id="soundBtn" class="soundbtn" aria-label="Toggle sound" title="Toggle sound">🔊</button>
       <div class="logo">Perfect Girl <span class="heart">♥</span></div>
       <div class="sub">Would you still say yes?</div>
     </header>
@@ -252,8 +259,58 @@
 
 <script>
 /* Bump on every push so you can tell which build is live (shown in the footer). */
-const APP_VERSION = "v2.1 · 2026-07-04";
+const APP_VERSION = "v2.2 · 2026-07-04";
 document.getElementById('ver').textContent = APP_VERSION + ' · ';
+
+/* ================= cute sound fx ================= */
+/* Synthesized with Web Audio (self-contained, no audio files): a bright rising
+   chime for yes/good, a soft descending "aww" for no/bad, a little lilt for maybe.
+   Toggle persists in localStorage; audio unlocks on the first tap/keypress. */
+let soundOn = (function(){ try{ return localStorage.getItem('pg_sound') !== 'off'; }catch(e){ return true; } })();
+let audioCtx = null;
+function ac(){
+  if(!audioCtx){ try{ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ return null; } }
+  if(audioCtx && audioCtx.state === 'suspended'){ audioCtx.resume(); }
+  return audioCtx;
+}
+/* one note with a soft attack/decay so it never clicks; optional pitch glide */
+function tone(freq, at, dur, type, peak, glideTo){
+  const c = ac(); if(!c) return;
+  const o = c.createOscillator(), g = c.createGain();
+  o.type = type || 'triangle';
+  o.frequency.setValueAtTime(freq, at);
+  if(glideTo){ o.frequency.exponentialRampToValueAtTime(glideTo, at + dur); }
+  g.gain.setValueAtTime(0.0001, at);
+  g.gain.exponentialRampToValueAtTime(peak || 0.2, at + 0.015);
+  g.gain.exponentialRampToValueAtTime(0.0001, at + dur);
+  o.connect(g); g.connect(c.destination);
+  o.start(at); o.stop(at + dur + 0.02);
+}
+function playHappy(){
+  if(!soundOn) return; const c = ac(); if(!c) return; const t = c.currentTime;
+  // bright rising arpeggio + a sparkle on top — reads as a cheerful "yay!"
+  [523.25, 659.25, 783.99, 1046.50].forEach((f,i)=> tone(f, t + i*0.07, 0.16, 'triangle', 0.22));
+  tone(1318.51, t + 0.28, 0.20, 'sine', 0.14, 1568.0);
+}
+function playSad(){
+  if(!soundOn) return; const c = ac(); if(!c) return; const t = c.currentTime;
+  // gentle descending minor slide — a little "aww"
+  tone(440.0, t,        0.22, 'sine', 0.20, 392.0);
+  tone(349.23, t + 0.16, 0.34, 'sine', 0.20, 293.66);
+}
+function playMaybe(){
+  if(!soundOn) return; const c = ac(); if(!c) return; const t = c.currentTime;
+  tone(659.25, t, 0.14, 'triangle', 0.16); tone(880.0, t + 0.10, 0.18, 'triangle', 0.16);
+}
+const soundBtn = document.getElementById('soundBtn');
+function renderSound(){ soundBtn.textContent = soundOn ? '🔊' : '🔇'; soundBtn.classList.toggle('off', !soundOn); }
+soundBtn.addEventListener('click', ()=>{
+  soundOn = !soundOn;
+  try{ localStorage.setItem('pg_sound', soundOn ? 'on' : 'off'); }catch(e){}
+  renderSound();
+  if(soundOn){ playHappy(); }   // little confirmation chirp when turning on
+});
+renderSound();
 
 /* Free-to-use portrait photos (Unsplash License). */
 const PHOTOS = [
@@ -462,7 +519,7 @@ function render(){
 }
 
 function choose(said){
-  if(said){ yes++; } else { no++; }
+  if(said){ yes++; playHappy(); } else { no++; playSad(); }
   els.card.classList.remove('in');
   els.card.classList.add(said ? 'out-yes' : 'out-no');
   setTimeout(() => {
@@ -709,7 +766,8 @@ function tAdvance(dir){   // 'yes' | 'no' | 'up'
 }
 
 function tChoose(verdict){
-  if(verdict==='maybe'){ tOpenNote(); return; }
+  if(verdict==='maybe'){ playMaybe(); tOpenNote(); return; }
+  if(verdict==='good'){ playHappy(); } else { playSad(); }
   tSet(verdict);
   tAdvance(verdict==='good' ? 'yes' : 'no');
 }
