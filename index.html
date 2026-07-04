@@ -252,7 +252,7 @@
 
 <script>
 /* Bump on every push so you can tell which build is live (shown in the footer). */
-const APP_VERSION = "v2.0 · 2026-07-04";
+const APP_VERSION = "v2.1 · 2026-07-04";
 document.getElementById('ver').textContent = APP_VERSION + ' · ';
 
 /* Free-to-use portrait photos (Unsplash License). */
@@ -377,12 +377,8 @@ const ISSUES = [
   "her umbrella releases a roach 5% of the time it opens.",
   "her leftovers, reheated, contain a roach 3% of the time.",
   "her hiccups produce a roach 5% of the time.",
-  "her apartment has never once needed an exterminator.",
-  "roaches leave the room when she raises her voice.",
 
   /* ---------- Shaq / The General / ordinary (batch 3) ---------- */
-  "she can change a ceiling bulb without standing on anything.",
-  "she ducks through every doorway out of habit.",
   "she gasps audibly when you pay full price.",
   "she quotes a replacement cost for anything you break, instantly.",
   "she leaves her location on and checks yours.",
@@ -400,17 +396,7 @@ const ISSUES = [
   "she brings up your ex in every argument.",
   "she keeps the television on all night to fall asleep.",
   "she double-texts and then calls if you do not reply within a minute.",
-  "she orders for you at every restaurant without asking.",
   "she leaves her wet laundry in the machine for days.",
-  "she reschedules every plan at least twice before it happens.",
-  "she interrupts to finish your sentences, always wrong.",
-  "she keeps every one of her exes saved under a nickname.",
-  "she leaves voicemails longer than the conversation would have been.",
-  "she plans the whole vacation and cancels it the week before.",
-  "she keeps score of every favor and calls them in.",
-  "she watches the next episode without you every time.",
-  "she flips her phone face-down whenever you walk in.",
-  "she signs you up for things without telling you.",
   "she takes an hour to answer a yes-or-no question.",
   "she has a different story about how you met for every friend.",
 ];
@@ -671,6 +657,22 @@ const SEED_RATINGS = {
   "her umbrella releases a roach 5% of the time it opens.": {verdict:"good",note:""},
   "her leftovers, reheated, contain a roach 3% of the time.": {verdict:"good",note:""},
   "her hiccups produce a roach 5% of the time.": {verdict:"good",note:""},
+  "she gasps audibly when you pay full price.": {verdict:"good",note:""},
+  "she quotes a replacement cost for anything you break, instantly.": {verdict:"good",note:""},
+  "she leaves her location on and checks yours.": {verdict:"good",note:""},
+  "she keeps a screenshot of every argument you have ever had.": {verdict:"good",note:""},
+  "she says she is five minutes away when she has not left the house.": {verdict:"good",note:""},
+  "she keeps her ex’s hoodie and wears it to bed.": {verdict:"good",note:""},
+  "she reads your texts over your shoulder as you type them.": {verdict:"good",note:""},
+  "she splits every bill to the exact cent, yours included.": {verdict:"good",note:""},
+  "she keeps a running list of everything you have done wrong.": {verdict:"good",note:""},
+  "she drives the gas tank to empty and never once refills it.": {verdict:"good",note:""},
+  "she leaves every cabinet door in the kitchen open.": {verdict:"good",note:""},
+  "she has to have the last word in every disagreement.": {verdict:"good",note:""},
+  "she brings up your ex in every argument.": {verdict:"good",note:""},
+  "she keeps the television on all night to fall asleep.": {verdict:"good",note:""},
+  "she double-texts and then calls if you do not reply within a minute.": {verdict:"good",note:""},
+  "she leaves her wet laundry in the machine for days.": {verdict:"good",note:""},
 };
 
 let tRatings = loadRatings();
