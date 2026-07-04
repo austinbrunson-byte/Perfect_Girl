@@ -128,6 +128,16 @@
   .look-b{font-size:15px;line-height:1.5;color:var(--ink)}
   .quote{font-family:var(--disp);font-style:italic;color:var(--pink2);font-size:14px;line-height:1.5;margin:16px auto 4px;max-width:340px}
   .youhint{font-size:11px;color:var(--dim);margin:14px 0 2px;letter-spacing:.5px}
+  .sharebox{margin-top:16px;display:flex;flex-direction:column;gap:8px}
+  .nameinput{width:100%;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.14);border-radius:14px;
+    color:var(--ink);font:inherit;font-size:15px;padding:12px 14px;text-align:center}
+  .nameinput:focus{outline:2px solid var(--pink);outline-offset:1px}
+  .shareout{font-size:11px;color:var(--pink2);word-break:break-all;background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px;margin-top:2px;line-height:1.45}
+  .sharetag{display:inline-block;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--pink2);
+    border:1px solid rgba(var(--pink-rgb),.3);border-radius:99px;padding:5px 12px;margin:2px 0 10px}
+  .sharewho{font-size:14px;color:var(--ink);margin:2px auto 4px;letter-spacing:.3px;max-width:320px;line-height:1.4}
+  .sharewho b{color:var(--pink2)}
 
   /* ---- tabs ---- */
   [hidden]{display:none !important}
@@ -297,7 +307,35 @@
         </div>
         <div class="quote" id="yQuote"></div>
         <div class="youhint" id="yFoot"></div>
-        <button class="again" id="yAgain">Play a round ▸</button>
+        <div class="sharebox">
+          <input id="yName" class="nameinput" type="text" maxlength="24" placeholder="Your name (optional)">
+          <button class="again" id="yShare">📨 Share my matchmaker link</button>
+          <div class="youhint">Send it to friends so they can go find someone for you.</div>
+          <div class="shareout" id="yShareOut" hidden></div>
+        </div>
+        <button class="again ghost2" id="yAgain">Play a round ▸</button>
+      </div>
+    </section>
+
+    <section id="shareView" hidden>
+      <div class="youscroll">
+        <div class="sharetag">🔎 Matchmaker brief</div>
+        <div class="arche-emoji" id="sEmoji">❔</div>
+        <div class="sharewho" id="sWho"></div>
+        <div class="archetype" id="sType">—</div>
+        <div class="rblurb" id="sBlurb"></div>
+        <div class="rrow">
+          <div class="stat"><b id="sRoach">–</b><span id="sRoachLbl">impossible</span></div>
+          <div class="stat"><b id="sHuman">–</b><span id="sHumanLbl">ordinary</span></div>
+          <div class="stat"><b id="sAns">0</b><span>answers</span></div>
+        </div>
+        <div class="look">
+          <div class="look-h">📍 Where to find them</div>
+          <div class="look-b" id="sLook"></div>
+        </div>
+        <div class="quote" id="sQuote"></div>
+        <div class="youhint" id="sFoot"></div>
+        <button class="again" id="sMine">Make your own ▸</button>
       </div>
     </section>
     <footer><span id="ver"></span>Photos via Unsplash</footer>
@@ -305,7 +343,7 @@
 
 <script>
 /* Bump on every push so you can tell which build is live (shown in the footer). */
-const APP_VERSION = "v2.10 · 2026-07-04";
+const APP_VERSION = "v2.11 · 2026-07-04";
 document.getElementById('ver').textContent = APP_VERSION + ' · ';
 
 /* ================= cute sound fx ================= */
@@ -1308,20 +1346,40 @@ const BANDS = [
 
 function pct(a,b){ return (a+b) > 0 ? Math.round(a/(a+b)*100) : null; }
 
-function renderYou(){
-  const p = loadProfile();
-  const answered = p.total || 0;
-  const yesR=p.yesRoach||0, noR=p.noRoach||0, yesH=p.yesHuman||0, noH=p.noHuman||0;
+/* Turn a raw tally (loadProfile() shape, or a decoded shared payload) into the
+   display pieces. Uses the active SUBJECT for axis labels / flavor / bands, so
+   the same function drives both the You tab and the shared matchmaker view. */
+function computeProfile(src){
+  const answered = src.total || 0;
+  const yesR=src.yesRoach||0, noR=src.noRoach||0, yesH=src.yesHuman||0, noH=src.noHuman||0;
   const roachPct = pct(yesR,noR), humanPct = pct(yesH,noH);
+  const out = {
+    answered, roachPct, humanPct,
+    labelA: SUBJECT.axisLabels.a, labelB: SUBJECT.axisLabels.b,
+    aYes: src.aYes || '', aNo: src.aNo || '', empty: answered === 0
+  };
+  if(out.empty) return out;
   const yTot=yesR+yesH, nTot=noR+noH;
+  const overall = (yTot+nTot) > 0 ? yTot/(yTot+nTot) : 0;
+  const band = BANDS.find(b => overall >= b.min) || BANDS[BANDS.length-1];
+  let flavor = '';
+  if(roachPct!=null && humanPct!=null){
+    const gap = humanPct - roachPct;
+    flavor = gap >= 25 ? SUBJECT.flavor.high : gap <= -25 ? SUBJECT.flavor.low : SUBJECT.flavor.mid;
+  }
+  out.emoji = band.emoji; out.name = band.name; out.desc = band.desc + flavor; out.look = band.look;
+  return out;
+}
 
-  y.ans.textContent   = answered;
-  y.roach.textContent = roachPct==null ? '–' : roachPct + '%';
-  y.human.textContent = humanPct==null ? '–' : humanPct + '%';
-  y.roachLbl.textContent = SUBJECT.axisLabels.a;
-  y.humanLbl.textContent = SUBJECT.axisLabels.b;
+function renderYou(){
+  const r = computeProfile(loadProfile());
+  y.ans.textContent   = r.answered;
+  y.roach.textContent = r.roachPct==null ? '–' : r.roachPct + '%';
+  y.human.textContent = r.humanPct==null ? '–' : r.humanPct + '%';
+  y.roachLbl.textContent = r.labelA;
+  y.humanLbl.textContent = r.labelB;
 
-  if(answered === 0){
+  if(r.empty){
     y.emoji.textContent = '❔';
     y.type.textContent  = 'Unwritten';
     y.sub.textContent   = 'no answers yet';
@@ -1333,34 +1391,121 @@ function renderYou(){
     return;
   }
 
-  const overall = (yTot+nTot) > 0 ? yTot/(yTot+nTot) : 0;
-  const band = BANDS.find(b => overall >= b.min) || BANDS[BANDS.length-1];
-
-  let flavor = '';
-  if(roachPct!=null && humanPct!=null){
-    const gap = humanPct - roachPct;
-    if(gap >= 25)       flavor = SUBJECT.flavor.high;
-    else if(gap <= -25) flavor = SUBJECT.flavor.low;
-    else                flavor = SUBJECT.flavor.mid;
-  }
-
-  y.emoji.textContent = band.emoji;
-  y.type.textContent  = band.name;
+  y.emoji.textContent = r.emoji;
+  y.type.textContent  = r.name;
   y.sub.textContent   = 'your type';
-  y.blurb.textContent = band.desc + flavor;
-  y.look.textContent  = band.look;
+  y.blurb.textContent = r.desc;
+  y.look.textContent  = r.look;
 
   const bits = [];
-  if(p.aYes) bits.push('You would still say yes to: “' + p.aYes + '”');
-  if(p.aNo)  bits.push('But not this: “' + p.aNo + '”');
+  if(r.aYes) bits.push('You would still say yes to: “' + r.aYes + '”');
+  if(r.aNo)  bits.push('But not this: “' + r.aNo + '”');
   y.quote.textContent = bits.join('  ');
 
-  y.foot.textContent  = answered < 8
+  y.foot.textContent  = r.answered < 8
     ? 'Provisional read — answer a few more and it sharpens.'
-    : 'Built from ' + answered + ' of your answers. It shifts as you keep playing.';
+    : 'Built from ' + r.answered + ' of your answers. It shifts as you keep playing.';
   y.again.textContent = 'Answer more ▸';
 }
 y.again.addEventListener('click', ()=>{ setMode('play'); start(); });
+
+/* ================= Matchmaker share link =================
+   Encode the current subject + profile tally into the URL hash so a friend
+   who opens the link sees a read-only "who to look for" brief. No backend —
+   everything travels in the link. */
+function encodeShare(o){ return btoa(unescape(encodeURIComponent(JSON.stringify(o)))); }
+function decodeShare(s){ try{ return JSON.parse(decodeURIComponent(escape(atob(s)))); }catch(e){ return null; } }
+
+function buildShareURL(){
+  const p = loadProfile();
+  const name = (document.getElementById('yName').value || '').trim().slice(0,24);
+  const payload = { v:1, s:subjectKey, n:name,
+    total:p.total||0, yesRoach:p.yesRoach||0, noRoach:p.noRoach||0,
+    yesHuman:p.yesHuman||0, noHuman:p.noHuman||0, aYes:p.aYes||'', aNo:p.aNo||'' };
+  return location.origin + location.pathname + '#s=' + encodeURIComponent(encodeShare(payload));
+}
+
+const yShareBtn = document.getElementById('yShare');
+const yShareOut = document.getElementById('yShareOut');
+const yNameInput = document.getElementById('yName');
+try{ const nm = localStorage.getItem('pg_name'); if(nm) yNameInput.value = nm; }catch(e){}
+yNameInput.addEventListener('input', ()=>{ try{ localStorage.setItem('pg_name', yNameInput.value.trim()); }catch(e){} });
+
+async function doShare(){
+  if((loadProfile().total||0) === 0){ tFlash(yShareBtn, 'Play a round first'); return; }
+  const url = buildShareURL();
+  yShareOut.textContent = url; yShareOut.hidden = false;
+  const noun = SUBJECT.title.replace('Perfect ','').toLowerCase();
+  const name = (yNameInput.value||'').trim();
+  const text = (name ? name : 'I') + (name ? ' needs' : ' need') + ' a matchmaker — here is the kind of ' + noun + ' to look for:';
+  if(navigator.share){
+    try{ await navigator.share({ title:'Find me a match', text, url }); return; }
+    catch(e){ if(e && e.name === 'AbortError') return; }
+  }
+  try{ await navigator.clipboard.writeText(url); tFlash(yShareBtn, 'Link copied ✓'); }
+  catch(e){
+    const ta = document.createElement('textarea'); ta.value = url;
+    ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); tFlash(yShareBtn, 'Link copied ✓'); }catch(_){ tFlash(yShareBtn, 'Copy the link below'); }
+    ta.remove();
+  }
+}
+yShareBtn.addEventListener('click', doShare);
+
+const s = {
+  emoji:document.getElementById('sEmoji'), who:document.getElementById('sWho'),
+  type:document.getElementById('sType'), blurb:document.getElementById('sBlurb'),
+  roach:document.getElementById('sRoach'), human:document.getElementById('sHuman'),
+  roachLbl:document.getElementById('sRoachLbl'), humanLbl:document.getElementById('sHumanLbl'),
+  ans:document.getElementById('sAns'), look:document.getElementById('sLook'),
+  quote:document.getElementById('sQuote'), foot:document.getElementById('sFoot')
+};
+
+function renderShare(o){
+  const who = o.n ? o.n : 'A friend';
+  const noun = SUBJECT.title.replace('Perfect ','').toLowerCase();
+  const r = computeProfile({ total:o.total, yesRoach:o.yesRoach, noRoach:o.noRoach,
+    yesHuman:o.yesHuman, noHuman:o.noHuman, aYes:o.aYes, aNo:o.aNo });
+
+  s.who.innerHTML = '<b>' + who + '</b> is looking for a ' + noun + '.';
+  s.ans.textContent = r.answered;
+  s.roach.textContent = r.roachPct==null ? '–' : r.roachPct + '%';
+  s.human.textContent = r.humanPct==null ? '–' : r.humanPct + '%';
+  s.roachLbl.textContent = r.labelA; s.humanLbl.textContent = r.labelB;
+
+  if(r.empty){
+    s.emoji.textContent = '❔';
+    s.type.textContent  = 'Still a mystery';
+    s.blurb.textContent = who + ' has not answered enough for a read yet. Tell them to play a round and send a new link.';
+    s.look.textContent  = 'No data to go on. Ask them to fill this out first.';
+    s.quote.textContent = ''; s.foot.textContent = '';
+    return;
+  }
+  s.emoji.textContent = r.emoji;
+  s.type.textContent  = r.name;
+  s.blurb.textContent = r.desc;
+  s.look.textContent  = r.look;
+  const bits = [];
+  if(r.aYes) bits.push('They would still say yes to: “' + r.aYes + '”');
+  if(r.aNo)  bits.push('Their hard no: “' + r.aNo + '”');
+  s.quote.textContent = bits.join('  ');
+  s.foot.textContent  = 'Built from ' + r.answered + ' of their answers. If you find someone, you know who to send them to.';
+}
+
+function enterShareMode(o){
+  applySubject(o.s, true);                    // theme + SUBJECT, without clobbering the viewer's own saved subject
+  document.querySelector('.tabs').style.display = 'none';
+  document.getElementById('swapBtn').style.display = 'none';
+  document.getElementById('playView').hidden = true;
+  document.getElementById('trainView').hidden = true;
+  document.getElementById('youView').hidden = true;
+  document.getElementById('shareView').hidden = false;
+  document.querySelector('.sub').textContent = 'Someone shared their results with you';
+  renderShare(o);
+}
+document.getElementById('sMine').addEventListener('click', ()=>{
+  location.hash = ''; location.reload();
+});
 
 /* ---------- tabs ---------- */
 function setMode(m){
@@ -1408,13 +1553,13 @@ const SUBJECTS = {
     }
   }
 };
-let SUBJECT = SUBJECTS.girl;
+let SUBJECT = SUBJECTS.girl, subjectKey = 'girl';
 
-function applySubject(sub){
-  SUBJECT = SUBJECTS[sub];
+function applySubject(sub, noPersist){
+  SUBJECT = SUBJECTS[sub]; subjectKey = sub;
   ISSUES = SUBJECT.bank; SEED_RATINGS = SUBJECT.seed; PHOTOS = SUBJECT.photos;
   LS_KEY = SUBJECT.lsRatings; PROFILE_KEY = SUBJECT.lsProfile;
-  try{ localStorage.setItem('pg_subject', sub); }catch(e){}
+  if(!noPersist){ try{ localStorage.setItem('pg_subject', sub); }catch(e){} }
 
   // load this subject's ratings and merge its baked seed (never overwriting local)
   tRatings = loadRatings();
@@ -1441,9 +1586,16 @@ document.getElementById('swapBtn').addEventListener('click', ()=>{
   applySubject(SUBJECT === SUBJECTS.girl ? 'guy' : 'girl');
 });
 
-let initSubject = 'girl';
-try{ const s = localStorage.getItem('pg_subject'); if(s === 'guy' || s === 'girl') initSubject = s; }catch(e){}
-applySubject(initSubject);
+/* If the URL carries a shared matchmaker brief, show that instead of the app. */
+const shareMatch = (location.hash || '').match(/^#s=(.+)$/);
+const sharePayload = shareMatch ? decodeShare(decodeURIComponent(shareMatch[1])) : null;
+if(sharePayload && (sharePayload.s === 'girl' || sharePayload.s === 'guy')){
+  enterShareMode(sharePayload);
+} else {
+  let initSubject = 'girl';
+  try{ const sv = localStorage.getItem('pg_subject'); if(sv === 'guy' || sv === 'girl') initSubject = sv; }catch(e){}
+  applySubject(initSubject);
+}
 </script>
 </body>
 </html>

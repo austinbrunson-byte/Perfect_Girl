@@ -59,6 +59,13 @@ the repo — **read `index.html` first** before making changes.
   ratings + profile localStorage keys and its own `SEED_*`. All of it is driven by the
   `SUBJECTS` config + `applySubject()`; the You axis labels/flavor come from there too
   (girl: impossible/ordinary; guy: red flags/little things).
+- **Matchmaker share link:** the You tab has a name field + "Share my matchmaker link"
+  (`navigator.share`, clipboard fallback, and the raw link shown). It encodes the
+  subject + profile tally into the URL hash (`#s=<base64 JSON>`, no backend). Opening
+  such a link shows a read-only `#shareView` ("<name> is looking for a girl/guy" + their
+  type, tolerances, hard-no, and where to look) themed to the shared subject, so friends
+  can go find them a match. `computeProfile()` is shared by the You tab and the share
+  view; "Make your own ▸" clears the hash and reloads.
 
 **My usual workflow — I'll do one of these:**
 1. Paste an exported **ratings JSON** → keep `good` verbatim + **bake into
