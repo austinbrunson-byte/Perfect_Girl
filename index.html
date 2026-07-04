@@ -259,7 +259,7 @@
 
 <script>
 /* Bump on every push so you can tell which build is live (shown in the footer). */
-const APP_VERSION = "v2.3 · 2026-07-04";
+const APP_VERSION = "v2.4 · 2026-07-04";
 document.getElementById('ver').textContent = APP_VERSION + ' · ';
 
 /* ================= cute sound fx ================= */
@@ -297,13 +297,31 @@ const YES_SRCS = ['sfx/yes-catgirl.mp3','sfx/yes-chuckle.mp3','sfx/yes-giggle.mp
 const yesPool = YES_SRCS.map(src=>{ const a = new Audio(src); a.preload = 'auto'; a.volume = 0.85; return a; });
 function playHappy(){
   if(!soundOn) return;
-  const ready = yesPool.filter(a => a.readyState >= 2);
-  if(ready.length){
-    const a = ready[(Math.random()*ready.length)|0];
-    try{ a.currentTime = 0; const pr = a.play(); if(pr && pr.catch) pr.catch(()=>{}); return; }catch(e){}
-  }
-  synthHappy();   // clips not loaded yet (e.g. first tap) — fall back to the chime
+  // Always try a real clip in the tap gesture — iOS never preloads, so gating on
+  // readyState would fall back to the chime forever. Fall back only if play fails.
+  const a = yesPool[(Math.random()*yesPool.length)|0];
+  try{
+    a.currentTime = 0;
+    const pr = a.play();
+    if(pr && pr.catch){ pr.catch(()=> synthHappy()); }
+  }catch(e){ synthHappy(); }
 }
+/* iOS unlock: on the first interaction, muted-play/pause each clip so later
+   unmuted plays are allowed and instant. Runs once, silently. */
+let audioUnlocked = false;
+function unlockAudio(){
+  if(audioUnlocked) return; audioUnlocked = true;
+  ac();
+  yesPool.forEach(a=>{
+    try{
+      a.muted = true;
+      const pr = a.play();
+      if(pr && pr.then){ pr.then(()=>{ a.pause(); a.currentTime = 0; a.muted = false; }).catch(()=>{ a.muted = false; }); }
+      else { a.pause(); a.muted = false; }
+    }catch(e){ a.muted = false; }
+  });
+}
+['pointerdown','touchstart','keydown'].forEach(ev=> window.addEventListener(ev, unlockAudio));
 function playSad(){
   if(!soundOn) return; const c = ac(); if(!c) return; const t = c.currentTime;
   // gentle descending minor slide — a little "aww"
