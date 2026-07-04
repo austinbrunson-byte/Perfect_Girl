@@ -248,7 +248,7 @@
 
 <script>
 /* Bump on every push so you can tell which build is live (shown in the footer). */
-const APP_VERSION = "v1.1 · 2026-07-04";
+const APP_VERSION = "v1.2 · 2026-07-04";
 document.getElementById('ver').textContent = APP_VERSION + ' · ';
 
 /* Free-to-use portrait photos (Unsplash License). */
@@ -429,21 +429,38 @@ function start(){
   render();
 }
 
+function preload(i){ const img = new Image(); img.src = photoDeck[i % photoDeck.length] + IMG_Q; }
+
 function render(){
   const total = deck.length;
   els.fill.style.width = (idx/total*100) + '%';
   els.count.textContent = 'Prospect ' + (idx+1) + ' of ' + total;
   els.issue.textContent = deck[idx];
   const src = photoDeck[idx % photoDeck.length] + IMG_Q;
-  els.photo.onerror = () => { els.photo.onerror = null; els.photo.src = fallbackFor(idx); };
-  els.photo.src = src;
+  const thisIdx = idx;
+  // Hold the incoming card hidden until its photo is decoded, so the new
+  // question and its picture arrive together instead of the new text landing
+  // over the previous card's photo while the next one loads.
   els.card.classList.remove('out-yes','out-no','in');
-  void els.card.offsetWidth;      // reflow to restart animation
-  els.card.classList.add('in');
-  els.card.style.transform = '';
-  els.card.style.opacity = '';
+  els.card.style.opacity = '0';
   els.stampYes.style.opacity = 0;
   els.stampNo.style.opacity = 0;
+  let shown = false;
+  const reveal = () => {
+    if(shown || idx !== thisIdx) return;       // ignore stale/duplicate reveals
+    shown = true;
+    els.card.classList.remove('in');
+    void els.card.offsetWidth;                 // reflow to restart the pop animation
+    els.card.classList.add('in');
+    els.card.style.transform = '';
+    els.card.style.opacity = '';
+  };
+  els.photo.onload  = () => { els.photo.onload = null; reveal(); };
+  els.photo.onerror = () => { els.photo.onerror = els.photo.onload = null; els.photo.src = fallbackFor(thisIdx); reveal(); };
+  els.photo.src = src;
+  if(els.photo.complete && els.photo.naturalWidth){ els.photo.onload = null; reveal(); }
+  setTimeout(reveal, 1200);        // safety net so a stalled photo never hangs the card
+  preload(idx + 1);               // warm the next photo for an instant next swipe
 }
 
 function choose(said){
