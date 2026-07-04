@@ -106,6 +106,19 @@
   .again:active{transform:scale(.97)}
   footer{text-align:center;font-size:10px;color:rgba(199,155,176,.6);margin-top:8px;letter-spacing:1px;flex:0 0 auto}
 
+  /* ---- you / profile ---- */
+  #youView{flex:1 1 auto;display:flex;flex-direction:column;min-height:0}
+  .youscroll{flex:1 1 auto;overflow-y:auto;text-align:center;padding:6px 4px 0;animation:pop .5s ease}
+  .arche-emoji{font-size:56px;line-height:1;margin-top:2px}
+  .archetype{font-family:var(--disp);font-size:30px;font-weight:800;line-height:1.12;margin:6px 0 2px;
+    background:linear-gradient(180deg,#fff,var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .look{background:linear-gradient(180deg,rgba(255,79,154,.12),rgba(255,79,154,.04));
+    border:1px solid rgba(255,79,154,.25);border-radius:18px;padding:15px 17px;margin:18px auto 4px;max-width:360px;text-align:left}
+  .look-h{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--pink2);margin-bottom:8px}
+  .look-b{font-size:15px;line-height:1.5;color:var(--ink)}
+  .quote{font-family:var(--disp);font-style:italic;color:var(--pink2);font-size:14px;line-height:1.5;margin:16px auto 4px;max-width:340px}
+  .youhint{font-size:11px;color:var(--dim);margin:14px 0 2px;letter-spacing:.5px}
+
   /* ---- tabs ---- */
   [hidden]{display:none !important}
   .tabs{display:flex;gap:8px;justify-content:center;margin:12px 0 2px;flex:0 0 auto}
@@ -161,6 +174,7 @@
     <div class="tabs">
       <button class="tab active" data-mode="play">Play</button>
       <button class="tab" data-mode="train">Train</button>
+      <button class="tab" data-mode="you">You</button>
     </div>
 
     <section id="playView">
@@ -254,12 +268,33 @@
       </div>
       <div class="hint" id="thint">Swipe or tap · left bad · up maybe · right good · <button class="linkbtn" id="tExport">see ratings ▸</button></div>
     </section>
+
+    <section id="youView" hidden>
+      <div class="youscroll">
+        <div class="arche-emoji" id="yEmoji">❔</div>
+        <div class="archetype" id="yType">—</div>
+        <div class="biglabel" id="ySub">your type</div>
+        <div class="rblurb" id="yBlurb"></div>
+        <div class="rrow">
+          <div class="stat"><b id="yRoach">–</b><span>roach-proof</span></div>
+          <div class="stat"><b id="yHuman">–</b><span>flaw-proof</span></div>
+          <div class="stat"><b id="yAns">0</b><span>answered</span></div>
+        </div>
+        <div class="look">
+          <div class="look-h">📍 Where to look</div>
+          <div class="look-b" id="yLook"></div>
+        </div>
+        <div class="quote" id="yQuote"></div>
+        <div class="youhint" id="yFoot"></div>
+        <button class="again" id="yAgain">Play a round ▸</button>
+      </div>
+    </section>
     <footer><span id="ver"></span>Photos via Unsplash</footer>
   </div>
 
 <script>
 /* Bump on every push so you can tell which build is live (shown in the footer). */
-const APP_VERSION = "v2.6 · 2026-07-04";
+const APP_VERSION = "v2.7 · 2026-07-04";
 document.getElementById('ver').textContent = APP_VERSION + ' · ';
 
 /* ================= cute sound fx ================= */
@@ -654,6 +689,7 @@ function render(){
 }
 
 function choose(said){
+  recordAnswer(deck[idx], said);
   if(said){ yes++; playHappy(); } else { no++; playSad(); }
   els.card.classList.remove('in');
   els.card.classList.add(said ? 'out-yes' : 'out-no');
@@ -1108,15 +1144,118 @@ window.addEventListener('keydown', e=>{
   if(e.key==='ArrowUp'   ||e.key==='m'||e.key==='M') tChoose('maybe');
 });
 
+/* ================= You: profile / "where to look" =================
+   A page you can open at any point. It reads your live Play answers
+   (accumulated across sessions in localStorage) and sorts them into two
+   axes — tolerance for the roaches vs. tolerance for ordinary human
+   flaws — then names a type and, deadpan, tells you where to look. */
+const PROFILE_KEY = 'pg_profile_v1';
+function loadProfile(){ try{ return JSON.parse(localStorage.getItem(PROFILE_KEY)) || {}; }catch(e){ return {}; } }
+function saveProfile(p){ try{ localStorage.setItem(PROFILE_KEY, JSON.stringify(p)); }catch(e){} }
+function recordAnswer(prompt, said){
+  const p = loadProfile();
+  const roach = /roach/i.test(prompt);
+  p.total = (p.total||0) + 1;
+  if(said){ const k = roach?'yesRoach':'yesHuman'; p[k] = (p[k]||0)+1; p.aYes = prompt; }
+  else    { const k = roach?'noRoach':'noHuman';   p[k] = (p[k]||0)+1; p.aNo  = prompt; }
+  saveProfile(p);
+}
+
+const y = {
+  emoji:document.getElementById('yEmoji'), type:document.getElementById('yType'),
+  sub:document.getElementById('ySub'), blurb:document.getElementById('yBlurb'),
+  roach:document.getElementById('yRoach'), human:document.getElementById('yHuman'),
+  ans:document.getElementById('yAns'), look:document.getElementById('yLook'),
+  quote:document.getElementById('yQuote'), foot:document.getElementById('yFoot'),
+  again:document.getElementById('yAgain')
+};
+
+/* base type from your overall yes-rate; ordered high → low */
+const BANDS = [
+  { min:0.85, emoji:'😇', name:'The Unconditional',
+    desc:'Almost nothing disqualifies a person for you. You looked at infestation and inconvenience alike and stayed put.',
+    look:'Anywhere with people in it. You are not the filter — you have taken yourself out of the way. So go outside; the rest is logistics.' },
+  { min:0.6, emoji:'🩷', name:'The Forgiving',
+    desc:'You say yes more than no. You accept that a whole person arrives with some freight, and you carry it without much complaint.',
+    look:'Wide and a little imperfect: karaoke night, the returns line, a group trip that went slightly wrong. You do well with real people in real conditions.' },
+  { min:0.4, emoji:'⚖️', name:'The Weigher',
+    desc:'You keep a running ledger. Some things you will take, some you will not, and you seem to know the exact exchange rate.',
+    look:'Somewhere you can observe a while before deciding — a weekly class, a regular bar, a long volunteer shift. You do not fall; you assess. Give yourself the data.' },
+  { min:0.15, emoji:'🔍', name:'The Particular',
+    desc:'You say no to most of it. Your standards are not cruel, but they are load-bearing, and you do not move them for company.',
+    look:'Small, curated rooms. A niche meetup for the one thing you actually care about. Volume will not help you — you would clear a bigger room just as fast. Aim narrow.' },
+  { min:0, emoji:'🗿', name:'The Immovable',
+    desc:'You said no to nearly everything. Nothing cleared the bar. The bar, at this point, may be the thing worth studying.',
+    look:'Start with a mirror — respectfully, the pattern is yours to own. Then, if you insist: somewhere quiet, and manage your expectations, and hers.' }
+];
+
+function pct(a,b){ return (a+b) > 0 ? Math.round(a/(a+b)*100) : null; }
+
+function renderYou(){
+  const p = loadProfile();
+  const answered = p.total || 0;
+  const yesR=p.yesRoach||0, noR=p.noRoach||0, yesH=p.yesHuman||0, noH=p.noHuman||0;
+  const roachPct = pct(yesR,noR), humanPct = pct(yesH,noH);
+  const yTot=yesR+yesH, nTot=noR+noH;
+
+  y.ans.textContent   = answered;
+  y.roach.textContent = roachPct==null ? '–' : roachPct + '%';
+  y.human.textContent = humanPct==null ? '–' : humanPct + '%';
+
+  if(answered === 0){
+    y.emoji.textContent = '❔';
+    y.type.textContent  = 'Unwritten';
+    y.sub.textContent   = 'no answers yet';
+    y.blurb.textContent = 'Who you are is still a hypothesis. The test does not guess — it counts. Play a round and it will tell you plainly.';
+    y.look.textContent  = 'Come back once you have said yes and no to a few. I will not send you anywhere on zero data.';
+    y.quote.textContent = '';
+    y.foot.textContent  = '';
+    y.again.textContent = 'Play a round ▸';
+    return;
+  }
+
+  const overall = (yTot+nTot) > 0 ? yTot/(yTot+nTot) : 0;
+  const band = BANDS.find(b => overall >= b.min) || BANDS[BANDS.length-1];
+
+  let flavor = '';
+  if(roachPct!=null && humanPct!=null){
+    const gap = humanPct - roachPct;
+    if(gap >= 25)       flavor = ' Your line is the roaches: cosmic infestation is where you are out, but ordinary human failure you can sit with.';
+    else if(gap <= -25) flavor = ' Oddly, the literal roaches do not move you — it is the human stuff, the clinginess and the money and the exes, that ends it.';
+    else                flavor = ' You do not sort your dealbreakers by type. A flaw is a flaw, roach or not.';
+  }
+
+  y.emoji.textContent = band.emoji;
+  y.type.textContent  = band.name;
+  y.sub.textContent   = 'your type';
+  y.blurb.textContent = band.desc + flavor;
+  y.look.textContent  = band.look;
+
+  const bits = [];
+  if(p.aYes) bits.push('You would still say yes to: “' + p.aYes + '”');
+  if(p.aNo)  bits.push('But not this: “' + p.aNo + '”');
+  y.quote.textContent = bits.join('  ');
+
+  y.foot.textContent  = answered < 8
+    ? 'Provisional read — answer a few more and it sharpens.'
+    : 'Built from ' + answered + ' of your answers. It shifts as you keep playing.';
+  y.again.textContent = 'Answer more ▸';
+}
+y.again.addEventListener('click', ()=>{ setMode('play'); start(); });
+
 /* ---------- tabs ---------- */
 function setMode(m){
   mode = m;
   document.querySelectorAll('.tab').forEach(b=> b.classList.toggle('active', b.dataset.mode===m));
   document.getElementById('playView').hidden  = (m!=='play');
   document.getElementById('trainView').hidden = (m!=='train');
-  document.querySelector('.sub').textContent = (m==='train')
-    ? 'Rate the questions — good or bad' : 'Would you still say yes?';
+  document.getElementById('youView').hidden   = (m!=='you');
+  document.querySelector('.sub').textContent =
+      m==='train' ? 'Rate the questions — good or bad'
+    : m==='you'   ? 'Who the answers say you are'
+    :               'Would you still say yes?';
   if(m==='train' && !tInited){ tInited = true; tStart(); }
+  if(m==='you'){ renderYou(); }
 }
 document.querySelectorAll('.tab').forEach(b=> b.addEventListener('click', ()=> setMode(b.dataset.mode)));
 
