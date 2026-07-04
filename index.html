@@ -252,7 +252,7 @@
 
 <script>
 /* Bump on every push so you can tell which build is live (shown in the footer). */
-const APP_VERSION = "v1.8 · 2026-07-04";
+const APP_VERSION = "v1.9 · 2026-07-04";
 document.getElementById('ver').textContent = APP_VERSION + ' · ';
 
 /* Free-to-use portrait photos (Unsplash License). */
@@ -370,28 +370,13 @@ const ISSUES = [
   /* ---------- roaches (batch 3) ---------- */
   "2% of the time you split a milkshake, a roach surfaces in it.",
   "3% of the time she fixes your collar, a roach drops down your back.",
-  "when you slow dance, 2% of the time a roach moves between you.",
-  "4% of the time she brushes crumbs off your shirt, one of them was a roach.",
-  "2% of the time you reach into her coat for the keys, you find a roach first.",
   "when she rests her head on your chest, 3% of the time a roach leaves her hair.",
   "6% of the time you share a bag of chips, a roach is already inside.",
-  "when you share a pillow, 2% of the time a roach is between your faces by morning.",
-  "2% of the time she wipes lipstick off your cheek, a roach comes with it.",
-  "when she tucks a note in your pocket, 4% of the time a roach is with it.",
   "2% of the time she does your tie, a roach is in the knot.",
-  "when she cuts your hair, 3% of the time a roach falls with the clippings.",
-  "5% of the time you share a scarf, a roach is in the weave.",
-  "when she zips your jacket, 3% of the time a roach rides the zipper to your chin.",
   "3% of the time she steals a fry off your plate, she leaves a roach in its place.",
-  "when you share a blanket on the couch, a roach joins 3% of the time.",
-  "2% of the time she kisses your forehead, a roach transfers to your hairline.",
   "her umbrella releases a roach 5% of the time it opens.",
-  "her sock drawer runs one roach per pair.",
   "her leftovers, reheated, contain a roach 3% of the time.",
-  "her wallet keeps a roach behind the cards.",
-  "her hairbrush drops a roach when tapped, 4% of the time.",
   "her hiccups produce a roach 5% of the time.",
-  "roaches will not cross her shadow.",
   "her apartment has never once needed an exterminator.",
   "roaches leave the room when she raises her voice.",
 
@@ -623,6 +608,11 @@ const SEED_RATINGS = {
   "2% of the time she feeds you off her fork, the bite is a roach.": {verdict:"good",note:""},
   "her nail clippings are roach shell.": {verdict:"good",note:""},
   "her shampoo dispenses a roach 5% of the time.": {verdict:"good",note:""},
+  "if she laughs longer than 10 seconds, a roach spawns within a meter of her.": {verdict:"good",note:""},
+  "her perfume attracts exactly one roach per wear, but it never reaches her.": {verdict:"good",note:""},
+  "1% of the rice in any dish she cooks is roach.": {verdict:"good",note:""},
+  "5% of mornings, her toothbrush holds a single roach leg among the bristles.": {verdict:"good",note:""},
+  "4% of the time she whispers in your ear, a roach steps onto your lobe.": {verdict:"good",note:""},
   "for eleven seconds each morning, she is Shaq.": {verdict:"good",note:""},
   "she has attempted four thousand free throws in her life and made none of them.": {verdict:"good",note:""},
   "she can hold your entire head in one hand. She does this while you are talking.": {verdict:"good",note:""},
@@ -645,6 +635,16 @@ const SEED_RATINGS = {
   "she claps when the plane lands.": {verdict:"good",note:""},
   "she calls you by her ex’s name and does not notice.": {verdict:"good",note:""},
   "she replies to texts three days later, if at all.": {verdict:"good",note:""},
+  "she texts her ex good morning, every morning.": {verdict:"good",note:""},
+  "2% of the time you split a milkshake, a roach surfaces in it.": {verdict:"good",note:""},
+  "3% of the time she fixes your collar, a roach drops down your back.": {verdict:"good",note:""},
+  "when she rests her head on your chest, 3% of the time a roach leaves her hair.": {verdict:"good",note:""},
+  "6% of the time you share a bag of chips, a roach is already inside.": {verdict:"good",note:""},
+  "2% of the time she does your tie, a roach is in the knot.": {verdict:"good",note:""},
+  "3% of the time she steals a fry off your plate, she leaves a roach in its place.": {verdict:"good",note:""},
+  "her umbrella releases a roach 5% of the time it opens.": {verdict:"good",note:""},
+  "her leftovers, reheated, contain a roach 3% of the time.": {verdict:"good",note:""},
+  "her hiccups produce a roach 5% of the time.": {verdict:"good",note:""},
 };
 
 let tRatings = loadRatings();
