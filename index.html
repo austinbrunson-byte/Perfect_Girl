@@ -139,11 +139,46 @@
   .sharewho{font-size:14px;color:var(--ink);margin:2px auto 4px;letter-spacing:.3px;max-width:320px;line-height:1.4}
   .sharewho b{color:var(--pink2)}
 
+  /* ---- first-open chooser ---- */
+  .chooser{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;
+    background:radial-gradient(120% 90% at 50% -10%,var(--bg-glow) 0%,var(--bg2) 45%,var(--bg) 100%);
+    padding:calc(env(safe-area-inset-top) + 20px) 18px calc(env(safe-area-inset-bottom) + 20px)}
+  .chooser-inner{width:100%;max-width:460px;display:flex;flex-direction:column;align-items:center}
+  .chooser-logo{font-family:var(--disp);font-weight:700;font-size:30px;color:var(--ink)}
+  .chooser-logo .heart{-webkit-text-fill-color:var(--pink);filter:drop-shadow(0 0 8px rgba(var(--pink-rgb),.6))}
+  .chooser-q{font-family:var(--disp);font-size:22px;color:var(--ink);margin:8px 0 20px;text-align:center}
+  .chooser-cards{display:flex;gap:14px;width:100%}
+  .choice{flex:1;min-width:0;padding:0;border:1px solid rgba(255,255,255,.1);border-radius:22px;overflow:hidden;
+    background:var(--card);cursor:pointer;display:flex;flex-direction:column;
+    box-shadow:0 16px 40px rgba(0,0,0,.5);transition:transform .1s ease,border-color .15s ease}
+  .choice:active{transform:scale(.97)}
+  .choice-photo{position:relative;width:100%;aspect-ratio:3/4;background:#2a1420 center/cover no-repeat}
+  .choice-photo img{width:100%;height:100%;object-fit:cover;display:block}
+  .choice-label{font-family:var(--disp);font-weight:700;font-size:16px;color:var(--ink);padding:12px 6px}
+  .choice[data-pick="girl"] .choice-label .heart{color:#ff4f9a}
+  .choice[data-pick="guy"] .choice-label .heart{color:#3f8cff}
+  .choice[data-pick="girl"]:active{border-color:#ff4f9a}
+  .choice[data-pick="guy"]:active{border-color:#3f8cff}
+  .chooser-note{font-size:11px;color:var(--dim);margin-top:18px;letter-spacing:.5px;text-align:center}
+
+  /* ---- account ---- */
+  #accountView{flex:1 1 auto;display:flex;flex-direction:column;min-height:0}
+  .acctform{display:flex;flex-direction:column;gap:10px;max-width:320px;margin:16px auto 0}
+  .acctmsg{font-size:12px;color:var(--pink2);min-height:15px;line-height:1.35;text-align:center}
+  .settings{max-width:340px;margin:20px auto 0;display:flex;flex-direction:column}
+  .setrow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 4px;border-bottom:1px solid rgba(255,255,255,.06)}
+  .setrow > span{font-size:13px;color:var(--dim);letter-spacing:.5px}
+  .seg{display:flex;gap:6px}
+  .seg button,.segbtn{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:var(--ink);
+    font:inherit;font-size:13px;font-weight:700;padding:7px 15px;border-radius:99px;cursor:pointer}
+  .seg button.on{background:linear-gradient(180deg,var(--pink2),var(--pink));color:#2a0316;border-color:transparent}
+  .nameinput.small{width:150px;padding:8px 11px;font-size:14px;text-align:right}
+
   /* ---- tabs ---- */
   [hidden]{display:none !important}
-  .tabs{display:flex;gap:8px;justify-content:center;margin:12px 0 2px;flex:0 0 auto}
+  .tabs{display:flex;gap:7px;justify-content:center;margin:12px 0 2px;flex:0 0 auto}
   .tab{appearance:none;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:var(--dim);
-    font-weight:800;font-size:11px;letter-spacing:2px;text-transform:uppercase;padding:8px 18px;border-radius:99px;
+    font-weight:800;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;padding:8px 13px;border-radius:99px;
     cursor:pointer;transition:background .15s ease,color .15s ease,border-color .15s ease}
   .tab.active{background:linear-gradient(180deg,var(--pink2),var(--pink));color:#2a0316;border-color:transparent}
   #playView,#trainView{flex:1 1 auto;display:flex;flex-direction:column;min-height:0}
@@ -196,6 +231,7 @@
       <button class="tab active" data-mode="play">Play</button>
       <button class="tab" data-mode="train">Train</button>
       <button class="tab" data-mode="you">You</button>
+      <button class="tab" data-mode="account">Account</button>
     </div>
 
     <section id="playView">
@@ -338,12 +374,66 @@
         <button class="again" id="sMine">Make your own ▸</button>
       </div>
     </section>
+
+    <section id="accountView" hidden>
+      <div class="youscroll">
+        <!-- signed out: register / log in -->
+        <div id="acctAuth">
+          <div class="arche-emoji">👤</div>
+          <div class="archetype" id="acctAuthTitle">Create account</div>
+          <div class="acctform">
+            <input id="acctName" class="nameinput" type="text" maxlength="24" placeholder="Name">
+            <input id="acctEmail" class="nameinput" type="email" autocomplete="email" placeholder="Email">
+            <input id="acctPass" class="nameinput" type="password" autocomplete="current-password" placeholder="Password">
+            <button class="again" id="acctSubmit">Create account</button>
+            <div class="acctmsg" id="acctMsg"></div>
+            <button class="linkbtn" id="acctToggle">Already have an account? Log in</button>
+          </div>
+          <div class="youhint">Accounts live on this device for now — the sign-in foundation for a future release.</div>
+        </div>
+        <!-- signed in: profile + settings -->
+        <div id="acctPanel" hidden>
+          <div class="arche-emoji">👤</div>
+          <div class="archetype" id="acctWho">—</div>
+          <div class="biglabel" id="acctEmailShow"></div>
+          <div class="settings">
+            <div class="setrow"><span>Looking for</span>
+              <div class="seg"><button data-set="girl" id="setGirl">Girl</button><button data-set="guy" id="setGuy">Guy</button></div>
+            </div>
+            <div class="setrow"><span>Sound</span>
+              <button class="segbtn" id="setSound">On</button></div>
+            <div class="setrow"><span>Display name</span>
+              <input id="setName" class="nameinput small" type="text" maxlength="24" placeholder="Your name"></div>
+          </div>
+          <button class="again ghost2" id="acctLogout">Log out</button>
+        </div>
+      </div>
+    </section>
     <footer><span id="ver"></span>Photos via Unsplash</footer>
+  </div>
+
+  <!-- first-open: pick who you're looking for (no swipe, just a choice) -->
+  <div id="chooser" class="chooser" hidden>
+    <div class="chooser-inner">
+      <div class="chooser-logo">Perfect <span class="heart">♥</span></div>
+      <div class="chooser-q">Who are you looking for?</div>
+      <div class="chooser-cards">
+        <button class="choice" data-pick="girl">
+          <div class="choice-photo"><img id="choiceGirlImg" alt="Perfect Girl"></div>
+          <div class="choice-label">Perfect Girl <span class="heart">♥</span></div>
+        </button>
+        <button class="choice" data-pick="guy">
+          <div class="choice-photo"><img id="choiceGuyImg" alt="Perfect Guy"></div>
+          <div class="choice-label">Perfect Guy <span class="heart">♥</span></div>
+        </button>
+      </div>
+      <div class="chooser-note">You can switch anytime with the ⇄ button up top.</div>
+    </div>
   </div>
 
 <script>
 /* Bump on every push so you can tell which build is live (shown in the footer). */
-const APP_VERSION = "v2.11 · 2026-07-04";
+const APP_VERSION = "v2.12 · 2026-07-04";
 document.getElementById('ver').textContent = APP_VERSION + ' · ';
 
 /* ================= cute sound fx ================= */
@@ -1511,17 +1601,122 @@ document.getElementById('sMine').addEventListener('click', ()=>{
 function setMode(m){
   mode = m;
   document.querySelectorAll('.tab').forEach(b=> b.classList.toggle('active', b.dataset.mode===m));
-  document.getElementById('playView').hidden  = (m!=='play');
-  document.getElementById('trainView').hidden = (m!=='train');
-  document.getElementById('youView').hidden   = (m!=='you');
+  document.getElementById('playView').hidden    = (m!=='play');
+  document.getElementById('trainView').hidden   = (m!=='train');
+  document.getElementById('youView').hidden     = (m!=='you');
+  document.getElementById('accountView').hidden = (m!=='account');
   document.querySelector('.sub').textContent =
-      m==='train' ? 'Rate the questions — good or bad'
-    : m==='you'   ? 'Who the answers say you are'
-    :               'Would you still say yes?';
+      m==='train'   ? 'Rate the questions — good or bad'
+    : m==='you'     ? 'Who the answers say you are'
+    : m==='account' ? 'Your account & settings'
+    :                 'Would you still say yes?';
   if(m==='train' && !tInited){ tInited = true; tStart(); }
   if(m==='you'){ renderYou(); }
+  if(m==='account'){ renderAccount(); }
 }
 document.querySelectorAll('.tab').forEach(b=> b.addEventListener('click', ()=> setMode(b.dataset.mode)));
+
+/* ================= Account (local foundation) =================
+   A device-local account + settings stub. No server yet: accounts and the
+   session live in localStorage. The seams (hashPass, loadAccounts, the submit
+   handler) are where a real auth backend drops in later. */
+const ACC_KEY = 'pg_accounts', SESS_KEY = 'pg_session';
+function loadAccounts(){ try{ return JSON.parse(localStorage.getItem(ACC_KEY)) || {}; }catch(e){ return {}; } }
+function saveAccounts(a){ try{ localStorage.setItem(ACC_KEY, JSON.stringify(a)); }catch(e){} }
+/* placeholder hash — NOT real security (local-only). Replace with server auth. */
+function hashPass(s){ let h = 5381; for(let i=0;i<s.length;i++){ h = ((h<<5) + h + s.charCodeAt(i)) >>> 0; } return 'h' + h.toString(16); }
+function currentUser(){
+  try{ const e = localStorage.getItem(SESS_KEY); if(!e) return null; const a = loadAccounts()[e]; return a ? {email:e, name:a.name} : null; }
+  catch(e){ return null; }
+}
+
+const acct = {
+  auth:document.getElementById('acctAuth'), panel:document.getElementById('acctPanel'),
+  title:document.getElementById('acctAuthTitle'), name:document.getElementById('acctName'),
+  email:document.getElementById('acctEmail'), pass:document.getElementById('acctPass'),
+  submit:document.getElementById('acctSubmit'), msg:document.getElementById('acctMsg'),
+  toggle:document.getElementById('acctToggle'), who:document.getElementById('acctWho'),
+  emailShow:document.getElementById('acctEmailShow'), logout:document.getElementById('acctLogout'),
+  setGirl:document.getElementById('setGirl'), setGuy:document.getElementById('setGuy'),
+  setSound:document.getElementById('setSound'), setName:document.getElementById('setName')
+};
+let acctMode = 'register';
+
+function applyAcctMode(){
+  const reg = acctMode === 'register';
+  acct.title.textContent  = reg ? 'Create account' : 'Log in';
+  acct.name.hidden        = !reg;
+  acct.submit.textContent = reg ? 'Create account' : 'Log in';
+  acct.toggle.textContent = reg ? 'Already have an account? Log in' : 'Need an account? Register';
+  acct.msg.textContent    = '';
+}
+acct.toggle.addEventListener('click', ()=>{ acctMode = acctMode==='register' ? 'login' : 'register'; applyAcctMode(); });
+
+acct.submit.addEventListener('click', ()=>{
+  const email = (acct.email.value||'').trim().toLowerCase();
+  const pass  = acct.pass.value||'';
+  if(!email || !pass){ acct.msg.textContent = 'Enter an email and password.'; return; }
+  const accs = loadAccounts();
+  if(acctMode === 'register'){
+    const name = (acct.name.value||'').trim();
+    if(accs[email]){ acct.msg.textContent = 'That email already has an account.'; return; }
+    accs[email] = { name, pass: hashPass(pass) }; saveAccounts(accs);
+    try{ localStorage.setItem(SESS_KEY, email); if(name) localStorage.setItem('pg_name', name); }catch(e){}
+  } else {
+    const a = accs[email];
+    if(!a || a.pass !== hashPass(pass)){ acct.msg.textContent = 'Wrong email or password.'; return; }
+    try{ localStorage.setItem(SESS_KEY, email); }catch(e){}
+  }
+  acct.pass.value = '';
+  renderAccount();
+});
+
+acct.logout.addEventListener('click', ()=>{ try{ localStorage.removeItem(SESS_KEY); }catch(e){} acctMode='login'; renderAccount(); });
+
+acct.setGirl.addEventListener('click', ()=>{ applySubject('girl'); renderAccount(); });
+acct.setGuy.addEventListener('click',  ()=>{ applySubject('guy');  renderAccount(); });
+acct.setSound.addEventListener('click', ()=>{
+  soundOn = !soundOn;
+  try{ localStorage.setItem('pg_sound', soundOn ? 'on' : 'off'); }catch(e){}
+  renderSound(); acct.setSound.textContent = soundOn ? 'On' : 'Off';
+  if(soundOn){ playHappy(); }
+});
+acct.setName.addEventListener('input', ()=>{
+  const v = acct.setName.value.trim();
+  try{ localStorage.setItem('pg_name', v); }catch(e){}
+  const yn = document.getElementById('yName'); if(yn) yn.value = v;
+});
+
+function renderAccount(){
+  const u = currentUser();
+  acct.auth.hidden = !!u;
+  acct.panel.hidden = !u;
+  if(u){
+    acct.who.textContent = u.name || 'Signed in';
+    acct.emailShow.textContent = u.email;
+    acct.setGirl.classList.toggle('on', subjectKey==='girl');
+    acct.setGuy.classList.toggle('on', subjectKey==='guy');
+    acct.setSound.textContent = soundOn ? 'On' : 'Off';
+    let nm = ''; try{ nm = localStorage.getItem('pg_name') || ''; }catch(e){}
+    acct.setName.value = nm || u.name || '';
+  } else {
+    applyAcctMode();
+  }
+}
+
+/* ================= First-open chooser ================= */
+function showChooser(){
+  const g = document.getElementById('choiceGirlImg'), b = document.getElementById('choiceGuyImg');
+  g.onerror = ()=>{ g.onerror=null; g.src = fallbackFor(0); };
+  b.onerror = ()=>{ b.onerror=null; b.src = fallbackFor(1); };
+  g.src = PHOTOS_GIRL[0] + IMG_Q;
+  b.src = PHOTOS_GUY[0]  + IMG_Q;
+  document.getElementById('chooser').hidden = false;
+}
+document.querySelectorAll('.choice').forEach(btn=> btn.addEventListener('click', ()=>{
+  applySubject(btn.dataset.pick);        // persists the choice
+  document.getElementById('chooser').hidden = true;
+}));
 
 /* ================= Girl / Guy subject swap =================
    Two parallel worlds. The guy bank drops every roach / Shaq / The General
@@ -1580,6 +1775,7 @@ function applySubject(sub, noPersist){
   tInited = false; tDeck = ISSUES.slice(); tIdx = 0;
   if(mode==='train'){ tInited = true; tStart(); }
   else if(mode==='you'){ renderYou(); }
+  else if(mode==='account'){ start(); renderAccount(); }
   else { start(); }
 }
 document.getElementById('swapBtn').addEventListener('click', ()=>{
@@ -1592,9 +1788,14 @@ const sharePayload = shareMatch ? decodeShare(decodeURIComponent(shareMatch[1]))
 if(sharePayload && (sharePayload.s === 'girl' || sharePayload.s === 'guy')){
   enterShareMode(sharePayload);
 } else {
-  let initSubject = 'girl';
-  try{ const sv = localStorage.getItem('pg_subject'); if(sv === 'guy' || sv === 'girl') initSubject = sv; }catch(e){}
-  applySubject(initSubject);
+  let saved = null;
+  try{ const sv = localStorage.getItem('pg_subject'); if(sv === 'guy' || sv === 'girl') saved = sv; }catch(e){}
+  if(saved){
+    applySubject(saved);
+  } else {
+    applySubject('girl', true);   // theme a default behind the overlay, don't persist
+    showChooser();                // first open: ask who you're looking for
+  }
 }
 </script>
 </body>

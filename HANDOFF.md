@@ -66,6 +66,15 @@ the repo — **read `index.html` first** before making changes.
   type, tolerances, hard-no, and where to look) themed to the shared subject, so friends
   can go find them a match. `computeProfile()` is shared by the You tab and the share
   view; "Make your own ▸" clears the hash and reloads.
+- **First-open chooser:** if no `pg_subject` is saved yet, a full-screen overlay
+  (`#chooser`) asks "Who are you looking for?" with a girl photo + guy photo (tap to
+  pick, no swipe). Picking calls `applySubject()` (persists) and dismisses it; after
+  that the saved subject loads straight in. Shared links skip the chooser.
+- **Account tab (local foundation):** a 4th tab. Device-local accounts in `localStorage`
+  (`pg_accounts` keyed by email, `pg_session` = current email) — register / log in /
+  log out, plus a settings panel (Looking for girl/guy → `applySubject`; Sound; Display
+  name → `pg_name`). No server yet; `hashPass()` is a placeholder — the seams
+  (`loadAccounts`/`hashPass`/submit handler) are where real auth drops in later.
 
 **My usual workflow — I'll do one of these:**
 1. Paste an exported **ratings JSON** → keep `good` verbatim + **bake into
