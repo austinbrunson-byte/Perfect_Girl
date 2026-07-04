@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="32%" r="85%">
+      <stop offset="0" stop-color="#4a1330"/>
+      <stop offset="1" stop-color="#12040c"/>
+    </radialGradient>
+    <linearGradient id="hair" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ff86bd"/>
+      <stop offset="1" stop-color="#ff4f9a"/>
+    </linearGradient>
+    <linearGradient id="eye" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffd23f"/>
+      <stop offset="1" stop-color="#ff4f9a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- full-bleed background (iOS rounds the corners itself) -->
+  <rect width="128" height="128" fill="url(#bg)"/>
+
+  <!-- back hair -->
+  <path d="M28 66c0-24 16-42 36-42s36 18 36 42c0 20-6 30-6 42H34c0-12-6-22-6-42z" fill="url(#hair)"/>
+
+  <!-- face -->
+  <path d="M42 58c0-16 10-27 22-27s22 11 22 27c0 17-11 29-22 29S42 75 42 58z" fill="#fbe3d0"/>
+
+  <!-- front bangs -->
+  <path d="M40 56c2-20 12-32 24-32s22 12 24 32c-6-8-13-11-13-11-3 6-6 8-6 8s-3-6-5-8c0 0-4 6-8 8 0 0-3-4-4-8 0 0-8 3-12 11z" fill="url(#hair)"/>
+
+  <!-- side hair strands -->
+  <path d="M40 56c-3 14-3 30 0 44 4-4 6-10 6-20s-4-20-6-24z" fill="url(#hair)"/>
+  <path d="M88 56c3 14 3 30 0 44-4-4-6-10-6-20s4-20 6-24z" fill="url(#hair)"/>
+
+  <!-- blush -->
+  <ellipse cx="52" cy="70" rx="6" ry="4" fill="#ff9ec4" opacity="0.7"/>
+  <ellipse cx="76" cy="70" rx="6" ry="4" fill="#ff9ec4" opacity="0.7"/>
+
+  <!-- eyes -->
+  <g>
+    <ellipse cx="54" cy="62" rx="7" ry="9" fill="#2a0316"/>
+    <ellipse cx="54" cy="62" rx="5.5" ry="7.5" fill="url(#eye)"/>
+    <circle cx="52" cy="59" r="2.4" fill="#fff"/>
+    <ellipse cx="74" cy="62" rx="7" ry="9" fill="#2a0316"/>
+    <ellipse cx="74" cy="62" rx="5.5" ry="7.5" fill="url(#eye)"/>
+    <circle cx="72" cy="59" r="2.4" fill="#fff"/>
+  </g>
+
+  <!-- mouth -->
+  <path d="M60 76c2 3 6 3 8 0" fill="none" stroke="#d21e3d" stroke-width="2.4" stroke-linecap="round"/>
+
+  <!-- heart accent -->
+  <path d="M96 34c2-3 7-3 7 1 0 3-4 6-7 8-3-2-7-5-7-8 0-4 5-4 7-1z" fill="#ff4f9a"/>
+</svg>
