@@ -222,7 +222,9 @@
           <div class="exportbtns">
             <button class="btn ghost" id="tCopy">Copy JSON</button>
             <button class="btn ghost" id="tDownload">Download</button>
+            <button class="btn ghost" id="tLoad">Load JSON</button>
           </div>
+          <input type="file" id="tLoadFile" accept="application/json,.json" hidden>
           <div class="tlists" id="tlists"></div>
           <button class="again" id="tResume">Review all</button>
           <button class="again ghost2" id="tReset">Reset ratings</button>
@@ -250,7 +252,7 @@
 
 <script>
 /* Bump on every push so you can tell which build is live (shown in the footer). */
-const APP_VERSION = "v1.6 · 2026-07-04";
+const APP_VERSION = "v1.7 · 2026-07-04";
 document.getElementById('ver').textContent = APP_VERSION + ' · ';
 
 /* Free-to-use portrait photos (Unsplash License). */
@@ -564,6 +566,7 @@ const t = {
   bad: document.getElementById('tBad'), rest: document.getElementById('tRest'),
   lists: document.getElementById('tlists'),
   copy: document.getElementById('tCopy'), download: document.getElementById('tDownload'),
+  load: document.getElementById('tLoad'), loadFile: document.getElementById('tLoadFile'),
   resume: document.getElementById('tResume'), reset: document.getElementById('tReset'),
   exportLink: document.getElementById('tExport')
 };
@@ -582,7 +585,18 @@ function saveRatings(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(tRating
 function tV(x){ const r = tRatings[x]; return r && r.verdict; }
 function tN(x){ const r = tRatings[x]; return (r && r.note) || ''; }
 
+/* Baked-in ratings from the owner's exported JSON, keyed by exact prompt text.
+   Merged in on load (without overwriting anything already decided locally) so
+   trained state ships with the app and survives cache clears, re-added Home
+   Screen icons, and new devices. Regenerate this from a Copy JSON export. */
+const SEED_RATINGS = {};
+
 let tRatings = loadRatings();
+(function seedRatings(){
+  let changed = false;
+  for(const k in SEED_RATINGS){ if(!tRatings[k]){ tRatings[k] = SEED_RATINGS[k]; changed = true; } }
+  if(changed) saveRatings();
+})();
 let tDeck = ISSUES.slice();
 let tIdx = 0, tInited = false, tNoteOpen = false;
 const T_BATCH = 30;   // rate this many new prompts per Train session
@@ -707,6 +721,47 @@ function tPayload(){
 }
 
 function tFlash(btn, msg){ const o = btn.textContent; btn.textContent = msg; setTimeout(()=>{ btn.textContent = o; }, 1200); }
+
+/* Restore ratings from a previously exported JSON (Copy JSON / Download output).
+   Accepts the full payload — prefers its keyed `ratings` map, falls back to the
+   good/maybe/bad arrays — and merges into the current ratings. */
+function tImport(obj){
+  let map = null;
+  if(obj && obj.ratings && typeof obj.ratings === 'object'){ map = obj.ratings; }
+  else if(obj){
+    map = {};
+    (obj.good||[]).forEach(x=>{ if(typeof x==='string') map[x] = {verdict:'good', note:''}; });
+    (obj.bad ||[]).forEach(x=>{ if(typeof x==='string') map[x] = {verdict:'bad',  note:''}; });
+    (obj.maybe||[]).forEach(m=>{ const txt = typeof m==='string' ? m : (m && m.text);
+      if(txt) map[txt] = {verdict:'maybe', note:(m && m.note) || ''}; });
+  }
+  if(!map) return 0;
+  let n = 0;
+  for(const k in map){ const v = map[k];
+    if(v && (v.verdict==='good'||v.verdict==='bad'||v.verdict==='maybe')){ tRatings[k] = {verdict:v.verdict, note:v.note||''}; n++; }
+  }
+  saveRatings();
+  return n;
+}
+
+t.load.addEventListener('click', ()=> t.loadFile.click());
+t.loadFile.addEventListener('change', e=>{
+  const f = e.target.files && e.target.files[0];
+  if(!f){ return; }
+  const r = new FileReader();
+  r.onload = ()=>{
+    try {
+      const n = tImport(JSON.parse(r.result));
+      tRatings = loadRatings();
+      tUpdateResults();
+      const left = ISSUES.filter(x=>!tV(x)).length;
+      t.count.textContent = (left===0 ? 'All caught up' : left + ' still unrated') + ' · ' + tRatedCount() + '/' + ISSUES.length + ' rated';
+      tFlash(t.load, 'Loaded ' + n + ' ✓');
+    } catch(err){ tFlash(t.load, 'Bad file'); }
+  };
+  r.readAsText(f);
+  e.target.value = '';
+});
 
 t.copy.addEventListener('click', async ()=>{
   const json = JSON.stringify(tPayload(), null, 2);
